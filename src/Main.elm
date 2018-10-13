@@ -1,23 +1,27 @@
 module Main exposing (..)
 
+import Dict exposing (Dict)
 import Html exposing (Html, div, h1, img, text)
-import Html.Attributes exposing (src)
-
-
----- MODEL ----
+import Kana exposing (Kana)
+import Kanji exposing (Kanji)
+import Word exposing (Word)
 
 
 type alias Model =
-    {}
+    { kana : Dict Char Kana
+    , kanji : Dict Char Kanji
+    , words : Dict String Word
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( {}, Cmd.none )
-
-
-
----- UPDATE ----
+    ( { kana = Dict.singleton (.hiragana Kana.default) Kana.default
+      , kanji = Dict.singleton (.character Kanji.default) Kanji.default
+      , words = Dict.singleton (.word Word.default) Word.default
+      }
+    , Cmd.none
+    )
 
 
 type Msg
@@ -29,20 +33,13 @@ update msg model =
     ( model, Cmd.none )
 
 
-
----- VIEW ----
-
-
 view : Model -> Html Msg
 view model =
     div []
-        [ img [ src "/logo.svg" ] []
-        , h1 [] [ text "Your Elm App is working!" ]
-        ]
-
-
-
----- PROGRAM ----
+        (List.map
+            (\( char, kanji ) -> text <| String.fromChar kanji.character)
+            (Dict.toList model.kanji)
+        )
 
 
 main : Program Never Model Msg
