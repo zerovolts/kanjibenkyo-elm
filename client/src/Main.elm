@@ -1,11 +1,14 @@
-module Main exposing (Model, Msg(..), init, main, update, view)
+module Main exposing (Model, init, main, update, view)
 
+import Api exposing (getAllKanji)
 import Browser exposing (Document)
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Html exposing (Html, div, h1, img, text)
+import Http
 import Kana exposing (Kana)
 import Kanji exposing (Kanji)
+import Msg exposing (Msg(..))
 import Url exposing (Url)
 import Word exposing (Word)
 
@@ -20,25 +23,37 @@ type alias Model =
 init : () -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
     ( { kana = Dict.singleton (.hiragana Kana.default) Kana.default
-      , kanji = Dict.singleton (.character Kanji.default) Kanji.default
+      , kanji = Dict.empty -- Dict.singleton (.character Kanji.default) Kanji.default
       , words = Dict.singleton (.word Word.default) Word.default
       }
-    , Cmd.none
+    , Cmd.batch [ Api.getAllKanji ]
     )
 
 
-type Msg
-    = NoOp
+kanjiToDict : List Kanji -> Dict Char Kanji
+kanjiToDict allKanji =
+    List.foldl
+        (\cur acc -> Dict.insert cur.character cur acc)
+        Dict.empty
+        allKanji
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        AllKanjiData (Ok kanjiList) ->
+            ( { model | kanji = kanjiToDict kanjiList }, Cmd.none )
+
+        AllKanjiData (Err _) ->
+            ( model, Cmd.none )
+
+        NoOp ->
+            ( model, Cmd.none )
 
 
 view : Model -> Document Msg
 view model =
-    { title = "kanjibenkyo"
+    { title = "kanjibenkyō"
     , body =
         [ div []
             (List.map

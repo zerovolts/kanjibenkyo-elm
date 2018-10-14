@@ -1,4 +1,4 @@
-module Word exposing (..)
+module Word exposing (VerbCategory(..), Word, WordCategory(..), default, defaultGodan, getKanji, toNegative, toPast)
 
 import Dict exposing (Dict)
 import Kana

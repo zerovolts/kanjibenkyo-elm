@@ -1,4 +1,4 @@
-module Kanji exposing (..)
+module Kanji exposing (Kanji, default, isKanji)
 
 import Char
 
