@@ -14,6 +14,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate diesel;
 
+mod controllers;
 mod models;
 mod schema;
 
@@ -48,8 +49,8 @@ fn main() {
 
     rocket::ignite()
         .mount("/", routes![index])
-        .mount("/kana", routes![models::kana::index])
-        .mount("/kanji", routes![models::kanji::index])
+        .mount("/kana", routes![controllers::kana::index])
+        .mount("/kanji", routes![controllers::kanji::index])
         .attach(options)
         .launch();
 }
