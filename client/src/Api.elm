@@ -1,9 +1,25 @@
-module Api exposing (decodeKanji, getAllKanji)
+module Api exposing (decodeKanji, getAllKana, getAllKanji)
 
 import Http
 import Json.Decode as D exposing (Decoder)
+import Kana exposing (Kana)
 import Kanji exposing (Kanji)
 import Msg exposing (Msg(..))
+
+
+getAllKana : Cmd Msg
+getAllKana =
+    Http.send
+        AllKanaData
+        (Http.get "http://localhost:8000/kana" (D.list decodeKana))
+
+
+decodeKana : Decoder Kana
+decodeKana =
+    D.map3 Kana
+        (D.field "hiragana" D.string |> D.andThen strToChar)
+        (D.field "katakana" D.string |> D.andThen strToChar)
+        (D.field "romaji" D.string)
 
 
 getAllKanji : Cmd Msg

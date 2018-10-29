@@ -1,6 +1,6 @@
 module Main exposing (Model, init, main, update, view)
 
-import Api exposing (getAllKanji)
+import Api exposing (getAllKana, getAllKanji)
 import Browser exposing (Document)
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
@@ -22,12 +22,20 @@ type alias Model =
 
 init : () -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( { kana = Dict.singleton (.hiragana Kana.default) Kana.default
+    ( { kana = Dict.empty -- Dict.singleton (.hiragana Kana.default) Kana.default
       , kanji = Dict.empty -- Dict.singleton (.character Kanji.default) Kanji.default
       , words = Dict.singleton (.word Word.default) Word.default
       }
-    , Cmd.batch [ Api.getAllKanji ]
+    , Cmd.batch [ Api.getAllKanji, Api.getAllKana ]
     )
+
+
+kanaToDict : List Kana -> Dict Char Kana
+kanaToDict allKana =
+    List.foldl
+        (\cur acc -> Dict.insert cur.hiragana cur acc)
+        Dict.empty
+        allKana
 
 
 kanjiToDict : List Kanji -> Dict Char Kanji
@@ -41,6 +49,12 @@ kanjiToDict allKanji =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        AllKanaData (Ok kanaList) ->
+            ( { model | kana = kanaToDict kanaList }, Cmd.none )
+
+        AllKanaData (Err _) ->
+            ( model, Cmd.none )
+
         AllKanjiData (Ok kanjiList) ->
             ( { model | kanji = kanjiToDict kanjiList }, Cmd.none )
 
@@ -59,6 +73,11 @@ view model =
             (List.map
                 (\( char, kanji ) -> text <| String.fromChar kanji.character)
                 (Dict.toList model.kanji)
+            )
+        , div []
+            (List.map
+                (\( char, kana ) -> text <| String.fromChar kana.hiragana)
+                (Dict.toList model.kana)
             )
         ]
     }

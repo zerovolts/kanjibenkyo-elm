@@ -15,12 +15,14 @@ extern crate serde_derive;
 extern crate diesel;
 
 mod controllers;
+mod dbconn;
 mod models;
 mod schema;
 
 use crate::schema::{kana, kanji};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use dotenv::dotenv;
 use rocket_cors::AllowedOrigins;
 use std::env;
@@ -37,26 +39,27 @@ fn main() {
         ..Default::default()
     };
 
-    let connection = establish_connection();
-    let all_kana = kana::table
-        .limit(5)
-        .load::<models::kana::Kana>(&connection)
-        .expect("Error loading kana");
+    // let connection = establish_connection();
+    // let all_kana = kana::table
+    //     .limit(5)
+    //     .load::<models::kana::Kana>(&connection)
+    //     .expect("Error loading kana");
 
-    let all_kanji = kanji::table
-        .limit(5)
-        .load::<models::kanji::Kanji>(&connection)
-        .expect("Error loading kanji");
+    // let all_kanji = kanji::table
+    //     .limit(5)
+    //     .load::<models::kanji::Kanji>(&connection)
+    //     .expect("Error loading kanji");
 
-    for kana in all_kana {
-        println!("{:?}", kana.hiragana);
-    }
+    // for kana in all_kana {
+    //     println!("{:?}", kana.hiragana);
+    // }
 
-    for kanji in all_kanji {
-        println!("{:?}", kanji.character);
-    }
+    // for kanji in all_kanji {
+    //     println!("{:?}", kanji.character);
+    // }
 
     rocket::ignite()
+        .manage(init_pool())
         .mount("/", routes![index])
         .mount("/kana", routes![controllers::kana::index])
         .mount("/kanji", routes![controllers::kanji::index])
@@ -64,9 +67,17 @@ fn main() {
         .launch();
 }
 
-pub fn establish_connection() -> PgConnection {
-    dotenv().ok();
+// pub fn establish_connection() -> PgConnection {
+//     dotenv().ok();
 
+//     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+//     PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
+// }
+
+fn init_pool() -> dbconn::PgPool {
+    dotenv().ok();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
+
+    let manager = ConnectionManager::<PgConnection>::new(database_url);
+    Pool::new(manager).expect("db pool")
 }
