@@ -1,0 +1,12 @@
+# global
+.env
+.DS_Store
+
+#server
+target/
+
+# client
+build/
+elm-stuff/
+node_modules/
+repl-temp-*
