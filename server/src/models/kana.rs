@@ -4,7 +4,7 @@ use crate::schema::kana;
 #[table_name = "kana"]
 pub struct Kana {
     pub id: i32,
-    pub hiragana: String,
-    pub katakana: String,
+    pub hiragana: String, //ideally a char
+    pub katakana: String, // ideally a char
     pub romaji: String,
 }

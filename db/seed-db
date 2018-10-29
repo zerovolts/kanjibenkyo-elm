@@ -1,0 +1,59 @@
+#!/usr/local/bin/node
+const fs = require("fs");
+const { promisify } = require("util");
+const { Client } = require("pg");
+
+const readFile = promisify(fs.readFile)
+
+const main = async () => {
+    console.log("connecting...");
+    const client = new Client({
+        user: "zachs",
+        host: "localhost",
+        database: "kanjibenkyo"
+    });
+    client.connect();
+    await seedKana(client);
+    await seedKanji(client);
+    client.end();
+    console.log("finished!");
+}
+
+const seedKana = async (client) => {
+    const kanaData = await readFile("kana.csv", "utf-8");
+    const allKana = parseCsv(kanaData);
+
+    console.log("dropping kana...");
+    await client.query("TRUNCATE kana");
+
+    console.log("seeding kana...");
+    for (const kana of allKana) {
+        await client.query(
+            "INSERT INTO kana VALUES (nextval('kana_id_seq'), $1, $2, $3)",
+            kana.slice(0, 3)
+        );
+    }
+}
+
+const seedKanji = async (client) => {
+    const kanjiData = await readFile("kanji.csv", "utf-8");
+    const allKanji = parseCsv(kanjiData);
+
+    console.log("dropping kanji...");
+    await client.query("TRUNCATE kanji");
+    console.log("seeding kanji...");
+    for (const kanji of allKanji) {
+        await client.query(
+            "INSERT INTO kanji VALUES (nextval('kanji_id_seq'), $1, $2, $3, $4, $5, $6, $7)",
+            kanji.slice(0, 8)
+        );
+    }
+}
+
+const parseCsv = (csvData) => {
+    const rows = csvData.split("\n").map(row => row.split(","));
+    rows.shift(); // remove headers
+    return rows;
+}
+
+main();

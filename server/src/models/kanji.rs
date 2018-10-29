@@ -4,11 +4,11 @@ use crate::schema::kanji;
 #[table_name = "kanji"]
 pub struct Kanji {
     pub id: i32,
-    pub character: char,
+    pub character: String, // ideally a char
     pub onyomi: Vec<String>,
     pub kunyomi: Vec<String>,
     pub meanings: Vec<String>,
-    pub jlpt: u8,
-    pub radical: char,
-    pub components: Vec<char>,
+    pub jlpt: i32,
+    pub radical: String, // ideally a char
+    pub components: Vec<String>,
 }

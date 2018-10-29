@@ -18,7 +18,7 @@ mod controllers;
 mod models;
 mod schema;
 
-use crate::schema::kana::table;
+use crate::schema::{kana, kanji};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
@@ -38,13 +38,22 @@ fn main() {
     };
 
     let connection = establish_connection();
-    let results = table
+    let all_kana = kana::table
         .limit(5)
         .load::<models::kana::Kana>(&connection)
         .expect("Error loading kana");
 
-    for result in results {
-        println!("{:?}", result.hiragana);
+    let all_kanji = kanji::table
+        .limit(5)
+        .load::<models::kanji::Kanji>(&connection)
+        .expect("Error loading kanji");
+
+    for kana in all_kana {
+        println!("{:?}", kana.hiragana);
+    }
+
+    for kanji in all_kanji {
+        println!("{:?}", kanji.character);
     }
 
     rocket::ignite()
