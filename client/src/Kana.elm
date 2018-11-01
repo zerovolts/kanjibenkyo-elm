@@ -1,4 +1,4 @@
-module Kana exposing (..)
+module Kana exposing (Category(..), Kana, VowelCategory(..), changeVowel, default, isHiragana, isKana, isKatakana, kanaGroups, vowelCategoryToIndex)
 
 import Char
 
@@ -18,12 +18,31 @@ default =
     }
 
 
+type Category
+    = Hiragana
+    | Katakana
+    | Romaji
+
+
 type VowelCategory
     = A
     | I
     | U
     | E
     | O
+
+
+type ConsonantCategory
+    = NoConsonant
+    | K
+    | S
+    | T
+    | N
+    | H
+    | M
+    | Y
+    | R
+    | W
 
 
 vowelCategoryToIndex : VowelCategory -> Int
