@@ -10,6 +10,7 @@ import Element
         , centerY
         , column
         , el
+        , link
         , padding
         , px
         , row
@@ -26,41 +27,36 @@ import Html.Attributes exposing (href, rel)
 import Kana exposing (Category(..))
 import Model exposing (Model)
 import Msg exposing (Msg(..))
+import Route exposing (Route(..))
 
 
 view : Model -> Document Msg
 view model =
     let
-        kanjiBlocks =
+        currentPage =
             column
-                [ Element.width Element.fill
+                [ Element.height Element.fill
+                , Element.width Element.fill
                 ]
                 [ navBar
-                , column
-                    [ Element.width Element.shrink
-                    , Element.centerX
-                    , Element.padding 64
-                    , Element.spacing 24
-                    ]
-                    [ row
-                        [ Element.width Element.fill
-                        , Element.spaceEvenly
-                        ]
-                        [ el [ Font.size 30 ]
-                            (text
-                                ("Kana - "
-                                    ++ (String.fromInt <|
-                                            List.length <|
-                                                Dict.toList model.kana
-                                       )
-                                )
-                            )
-                        , kanaFilterGroup model.kanaFilter
-                        ]
-                    , hr
-                    , el [ Element.centerX ]
-                        (kanaGrid model.kana model.kanaFilter)
-                    ]
+                , case model.route of
+                    Home ->
+                        homePage
+
+                    KanaIndex ->
+                        kanaGridPage model.kana model.kanaFilter
+
+                    KanaShow kana ->
+                        el [] (text <| "Kana - " ++ kana)
+
+                    KanjiIndex ->
+                        kanjiGridPage model.kanji
+
+                    WordIndex ->
+                        wordGridPage Dict.empty
+
+                    NotFound ->
+                        el [] (text "Not Found!")
                 ]
     in
     { title = "kanjibenkyō"
@@ -77,9 +73,153 @@ view model =
             []
         , Element.layout
             globalStyles
-            kanjiBlocks
+            currentPage
         ]
     }
+
+
+homePage =
+    let
+        columnTopPiece =
+            el
+                [ Background.color Color.orange
+                , Element.height Element.fill
+                , Element.width (px 76)
+                ]
+                Element.none
+
+        columnLeg =
+            column
+                [ Element.height Element.fill
+                , Element.width (px 76)
+                ]
+                [ el
+                    [ Element.height Element.fill
+                    , Element.width Element.fill
+                    , Background.color Color.orange
+                    ]
+                    Element.none
+                , el
+                    [ Element.height Element.fill
+                    , Element.width Element.fill
+                    , Background.color Color.text
+                    ]
+                    Element.none
+                ]
+    in
+    column
+        [ Element.height Element.fill
+        , Element.width Element.fill
+        ]
+        [ row
+            [ Element.width Element.fill
+            , Element.height (px 60)
+            , Element.paddingXY 64 0
+            , Element.spaceEvenly
+            ]
+            [ columnTopPiece, columnTopPiece, columnTopPiece ]
+        , el
+            [ Background.color Color.orange
+            , Border.widthEach { bottom = 4, left = 0, right = 0, top = 0 }
+            , Border.color Color.orangeDark
+            , Element.width Element.fill
+            , Element.height (px 52)
+            ]
+            Element.none
+        , row
+            [ Element.height Element.fill
+            , Element.width Element.fill
+            , Element.paddingXY 64 0
+            , Element.spaceEvenly
+            ]
+            [ columnLeg, columnLeg ]
+        ]
+
+
+kanjiGridPage kanji =
+    let
+        kanjiList =
+            Dict.toList kanji
+    in
+    column
+        [ Element.width Element.fill
+        , Element.padding 64
+        , Element.spacing 24
+        ]
+        [ row
+            [ Element.width Element.fill
+            , Element.spaceEvenly
+            ]
+            [ el [ Font.size 30 ]
+                (text ("Kanji - " ++ (String.fromInt <| List.length kanjiList)))
+            , Element.none
+            ]
+        , hr
+        , wrappedRow
+            [ Element.spacing 12
+            ]
+            (List.map
+                (\( char, _ ) -> charBlock <| String.fromChar char)
+                kanjiList
+            )
+        ]
+
+
+wordGridPage words =
+    let
+        wordList =
+            Dict.toList words
+    in
+    column
+        [ Element.width Element.fill
+        , Element.padding 64
+        , Element.spacing 24
+        ]
+        [ row
+            [ Element.width Element.fill
+            , Element.spaceEvenly
+            ]
+            [ el [ Font.size 30 ]
+                (text ("Words - " ++ (String.fromInt <| List.length wordList)))
+            , Element.none
+            ]
+        , hr
+        , wrappedRow
+            [ Element.spacing 12
+            ]
+            (List.map
+                (\( char, _ ) -> charBlock <| String.fromChar char)
+                wordList
+            )
+        ]
+
+
+kanaGridPage kana kanaFilter =
+    column
+        [ Element.width Element.shrink
+        , Element.centerX
+        , Element.padding 64
+        , Element.spacing 24
+        ]
+        [ row
+            [ Element.width Element.fill
+            , Element.spaceEvenly
+            ]
+            [ el [ Font.size 30 ]
+                (text
+                    ("Kana - "
+                        ++ (String.fromInt <|
+                                List.length <|
+                                    Dict.toList kana
+                           )
+                    )
+                )
+            , kanaFilterGroup kanaFilter
+            ]
+        , hr
+        , el [ Element.centerX ]
+            (kanaGrid kana kanaFilter)
+        ]
 
 
 kanaGridTemplate : List (List (Maybe Char))
@@ -220,14 +360,19 @@ navBar =
 
 
 titleText =
-    row
-        [ Font.size 26
-        , Element.height Element.fill
-        , Element.pointer
+    link
+        [ Element.height Element.fill
         ]
-        [ el [] (text "漢字勉強")
-        , el [ Font.color Color.white ] (text "kanjibenkyō")
-        ]
+        { url = "/"
+        , label =
+            row
+                [ Font.size 26
+                , Element.pointer
+                ]
+                [ el [] (text "漢字勉強")
+                , el [ Font.color Color.white ] (text "kanjibenkyō")
+                ]
+        }
 
 
 navLinks =
@@ -238,16 +383,18 @@ navLinks =
         , Element.height Element.fill
         , Element.pointer
         ]
-        [ navLink "Kana", navLink "Kanji", navLink "Words" ]
+        [ navLink "Kana" "/kana", navLink "Kanji" "/kanji", navLink "Words" "/words" ]
 
 
-navLink label =
-    el
+navLink label url =
+    link
         [ Element.mouseOver [ Background.color Color.orangeDark ]
         , Element.height Element.fill
         , Element.paddingXY 24 0
         ]
-        (el [ Element.centerY ] (text label))
+        { url = url
+        , label = el [ Element.centerY ] (text label)
+        }
 
 
 globalStyles =
@@ -263,7 +410,7 @@ globalStyles =
 
 
 charBlock char =
-    el
+    link
         [ Background.color Color.white
         , Element.width (px 48)
         , Element.height (px 48)
@@ -271,9 +418,11 @@ charBlock char =
         , Font.size 24
         , Element.pointer
         ]
-        (el
-            [ Element.centerX
-            , Element.centerY
-            ]
-            (text char)
-        )
+        { url = "/kana/" ++ char
+        , label =
+            el
+                [ Element.centerX
+                , Element.centerY
+                ]
+                (text char)
+        }

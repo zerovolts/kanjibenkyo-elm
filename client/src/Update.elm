@@ -1,10 +1,14 @@
 module Update exposing (kanaToDict, kanjiToDict, update)
 
+import Browser
+import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import Kana exposing (Kana)
 import Kanji exposing (Kanji)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
+import Route
+import Url
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -22,8 +26,16 @@ update msg model =
         AllKanjiData (Err _) ->
             ( model, Cmd.none )
 
+        LinkClicked urlRequest ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
+
+                Browser.External href ->
+                    ( model, Nav.load href )
+
         UrlChanged url ->
-            ( { model | url = url }, Cmd.none )
+            ( { model | url = url, route = Route.toRoute url }, Cmd.none )
 
         ChangeKanaCategory category ->
             ( { model | kanaFilter = category }, Cmd.none )

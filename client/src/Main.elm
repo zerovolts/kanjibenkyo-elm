@@ -15,5 +15,5 @@ main =
         , update = update
         , subscriptions = always Sub.none
         , onUrlChange = UrlChanged
-        , onUrlRequest = always NoOp
+        , onUrlRequest = LinkClicked
         }
