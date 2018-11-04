@@ -3,7 +3,7 @@ module Msg exposing (Msg(..))
 import Browser exposing (UrlRequest)
 import Http
 import Kana exposing (Category, Kana)
-import Kanji exposing (Kanji)
+import Kanji exposing (Kanji, KanjiGrouping)
 import Url exposing (Url)
 
 
@@ -14,3 +14,4 @@ type Msg
     | AllKanaData (Result Http.Error (List Kana))
     | AllKanjiData (Result Http.Error (List Kanji))
     | ChangeKanaCategory Category
+    | ChangeKanjiGrouping KanjiGrouping

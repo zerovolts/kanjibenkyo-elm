@@ -12,9 +12,9 @@ type alias Kana =
 
 default : Kana
 default =
-    { hiragana = 'あ'
-    , katakana = 'ア'
-    , romaji = "a"
+    { hiragana = ' '
+    , katakana = ' '
+    , romaji = ""
     }
 
 

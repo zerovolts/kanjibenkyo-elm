@@ -2,6 +2,7 @@
 const fs = require("fs");
 const { promisify } = require("util");
 const { Client } = require("pg");
+const { process } = require("process")
 
 const readFile = promisify(fs.readFile)
 
@@ -36,19 +37,44 @@ const seedKana = async (client) => {
 }
 
 const seedKanji = async (client) => {
-    const kanjiData = await readFile("kanji.csv", "utf-8");
-    const allKanji = parseCsv(kanjiData);
+    const kanjiData = await readFile("kanji.json", "utf-8");
+    const allKanji = JSON.parse(kanjiData);
 
     console.log("dropping kanji...");
     await client.query("TRUNCATE kanji");
     console.log("seeding kanji...");
     for (const kanji of allKanji) {
         await client.query(
-            "INSERT INTO kanji VALUES (nextval('kanji_id_seq'), $1, $2, $3, $4, $5, $6, $7)",
-            kanji.slice(0, 8)
+            "INSERT INTO kanji VALUES (nextval('kanji_id_seq'), $1, $2, $3, $4, $5, $6, $7, $8)",
+            [
+                charize(kanji.kanji),
+                kanji.strokes,
+                kanji.onyomi,
+                kanji.kunyomi,
+                splitMeaning(kanji.meaning),
+                convertGrade(kanji.grade),
+                charize(kanji.radical),
+                []
+            ]
         );
     }
 }
+
+const splitMeaning = meanings =>
+    meanings.split(",").map(meaning => meaning.trim())
+
+const charize = (character) => {
+    if (character.length > 1) {
+        console.log(`converted ${character} to ${character[0]}`)
+    } else {
+        // console.log(character[0])
+    }
+    // process.stdout.write("hello")
+    return character[0]
+}
+
+const convertGrade = grade =>
+    (grade === "S" ? "-1" : grade)
 
 const parseCsv = (csvData) => {
     const rows = csvData.split("\n").map(row => row.split(","));

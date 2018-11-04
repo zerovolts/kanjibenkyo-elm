@@ -1,26 +1,34 @@
-module Kanji exposing (Kanji, default, isKanji)
+module Kanji exposing (Kanji, KanjiGrouping(..), default, isKanji)
 
 import Char
 
 
 type alias Kanji =
     { character : Char
+    , strokes : Int
     , onyomi : List String
     , kunyomi : List String
     , meanings : List String
-    , jlpt : Int
+    , grade : Int
     , radical : Char
     , components : List Char
     }
 
 
+type KanjiGrouping
+    = Grade
+    | StrokeCount
+    | Radical
+
+
 default : Kanji
 default =
-    { character = '見'
+    { character = ' '
+    , strokes = 7
     , onyomi = [ "ケン" ]
     , kunyomi = [ "み" ]
     , meanings = [ "see" ]
-    , jlpt = 5
+    , grade = 5
     , radical = '見'
     , components = []
     }

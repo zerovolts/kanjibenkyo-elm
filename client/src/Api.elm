@@ -1,10 +1,12 @@
-module Api exposing (decodeKanji, getAllKana, getAllKanji)
+module Api exposing (decodeKanji, getAllKana, getAllKanji, getAllKanjiIfNeeded)
 
+import Dict exposing (Dict)
 import Http
 import Json.Decode as D exposing (Decoder)
 import Kana exposing (Kana)
 import Kanji exposing (Kanji)
 import Msg exposing (Msg(..))
+import Route exposing (Route(..))
 
 
 getAllKana : Cmd Msg
@@ -22,6 +24,15 @@ decodeKana =
         (D.field "romaji" D.string)
 
 
+getAllKanjiIfNeeded : List Char -> Cmd Msg
+getAllKanjiIfNeeded kanji =
+    if List.length kanji > 0 then
+        Cmd.none
+
+    else
+        getAllKanji
+
+
 getAllKanji : Cmd Msg
 getAllKanji =
     Http.send
@@ -31,12 +42,13 @@ getAllKanji =
 
 decodeKanji : Decoder Kanji
 decodeKanji =
-    D.map7 Kanji
+    D.map8 Kanji
         (D.field "character" D.string |> D.andThen strToChar)
+        (D.field "strokes" D.int)
         (D.field "onyomi" (D.list D.string))
         (D.field "kunyomi" (D.list D.string))
         (D.field "meanings" (D.list D.string))
-        (D.field "jlpt" D.int)
+        (D.field "grade" D.int)
         (D.field "radical" D.string |> D.andThen strToChar)
         (D.field "components" (D.list (D.string |> D.andThen strToChar)))
 

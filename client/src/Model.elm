@@ -1,36 +1,59 @@
-module Model exposing (Model, init)
+module Model exposing (Model, fetchRouteData, init)
 
-import Api exposing (getAllKana, getAllKanji)
+import Api exposing (getAllKana, getAllKanjiIfNeeded)
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Kana exposing (Category(..), Kana)
-import Kanji exposing (Kanji)
+import Kanji exposing (Kanji, KanjiGrouping(..))
 import Msg exposing (Msg(..))
-import Route exposing (Route)
+import Route exposing (Route(..))
 import Url exposing (Url)
 import Word exposing (Word)
 
 
 type alias Model =
-    { kana : Dict Char Kana
-    , kanji : Dict Char Kanji
-    , words : Dict String Word
+    { kanaDict : Dict Char Kana
+    , kanjiDict : Dict Char Kanji
+    , wordsDict : Dict String Word
+    , kana : List Char
+    , kanji : List Char
     , url : Url
     , key : Key
     , route : Route
-    , kanaFilter : Kana.Category
+    , kanaFilter : Category
+    , kanjiGrouping : KanjiGrouping
     }
 
 
 init : () -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( { kana = Dict.empty -- Dict.singleton (.hiragana Kana.default) Kana.default
-      , kanji = Dict.empty -- Dict.singleton (.character Kanji.default) Kanji.default
-      , words = Dict.singleton (.word Word.default) Word.default
-      , url = url
-      , key = key
-      , route = Route.toRoute url
-      , kanaFilter = Hiragana
-      }
-    , Cmd.batch [ Api.getAllKanji, Api.getAllKana ]
+    let
+        model =
+            { kanaDict = Dict.empty
+            , kanjiDict = Dict.empty
+            , wordsDict = Dict.singleton (.word Word.default) Word.default
+            , kana = []
+            , kanji = []
+            , url = url
+            , key = key
+            , route = Route.toRoute url
+            , kanaFilter = Hiragana
+            , kanjiGrouping = Grade
+            }
+    in
+    ( model
+    , fetchRouteData model (Route.toRoute url)
     )
+
+
+fetchRouteData : Model -> Route -> Cmd Msg
+fetchRouteData model route =
+    case route of
+        KanjiIndex ->
+            getAllKanjiIfNeeded model.kanji
+
+        KanaIndex ->
+            getAllKana
+
+        _ ->
+            Cmd.none

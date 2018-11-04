@@ -11,10 +11,11 @@ table! {
     kanji (id) {
         id -> Int4,
         character -> Varchar,
+        strokes -> Int4,
         onyomi -> Array<Text>,
         kunyomi -> Array<Text>,
         meanings -> Array<Text>,
-        jlpt -> Int4,
+        grade -> Int4,
         radical -> Varchar,
         components -> Array<Text>,
     }

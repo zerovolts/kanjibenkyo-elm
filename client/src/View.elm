@@ -2,7 +2,7 @@ module View exposing (view)
 
 import Browser exposing (Document)
 import Color
-import Dict
+import Dict exposing (Dict)
 import Element
     exposing
         ( Element
@@ -22,12 +22,15 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
+import Element.Lazy as Lazy
 import Html exposing (node)
 import Html.Attributes exposing (href, rel)
 import Kana exposing (Category(..))
+import Kanji exposing (Kanji, KanjiGrouping(..))
 import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Route exposing (Route(..))
+import Url
 
 
 view : Model -> Document Msg
@@ -38,19 +41,28 @@ view model =
                 [ Element.height Element.fill
                 , Element.width Element.fill
                 ]
-                [ navBar
+                [ Lazy.lazy navBar
+                    [ titleText
+                    , navLinks
+                    ]
                 , case model.route of
                     Home ->
                         homePage
 
                     KanaIndex ->
-                        kanaGridPage model.kana model.kanaFilter
+                        kanaGridPage model.kanaDict model.kanaFilter
 
-                    KanaShow kana ->
-                        el [] (text <| "Kana - " ++ kana)
+                    KanaShow kanaStr ->
+                        let
+                            ( kanaChar, _ ) =
+                                Maybe.withDefault
+                                    (Tuple.pair 'a' "")
+                                    (String.uncons (Maybe.withDefault "" (Url.percentDecode kanaStr)))
+                        in
+                        kanaShowPage model.kanaDict kanaChar
 
                     KanjiIndex ->
-                        kanjiGridPage model.kanji
+                        kanjiGridPage model.kanjiDict model.kanjiGrouping
 
                     WordIndex ->
                         wordGridPage Dict.empty
@@ -136,10 +148,25 @@ homePage =
         ]
 
 
-kanjiGridPage kanji =
+kanaShowPage kanaDict kanaStr =
+    let
+        kana =
+            Maybe.withDefault Kana.default (Dict.get kanaStr kanaDict)
+    in
+    column
+        []
+        [ el [] (text <| String.fromChar kana.hiragana) ]
+
+
+kanjiGridPage : Dict Char Kanji -> KanjiGrouping -> Element Msg
+kanjiGridPage kanjiDict kanjiGrouping =
     let
         kanjiList =
-            Dict.toList kanji
+            Dict.toList kanjiDict
+
+        kanjiGroups : List (Group Char)
+        kanjiGroups =
+            groupKanji kanjiList kanjiGrouping
     in
     column
         [ Element.width Element.fill
@@ -151,16 +178,25 @@ kanjiGridPage kanji =
             , Element.spaceEvenly
             ]
             [ el [ Font.size 30 ]
-                (text ("Kanji - " ++ (String.fromInt <| List.length kanjiList)))
-            , Element.none
+                (text ("Kanji - " ++ (String.fromInt <| List.length <| kanjiList)))
+            , viewKanjiGrouping kanjiGrouping
             ]
-        , hr
-        , wrappedRow
-            [ Element.spacing 12
-            ]
+        , column [ Element.width Element.fill, Element.spacing 32 ]
             (List.map
-                (\( char, _ ) -> charBlock <| String.fromChar char)
-                kanjiList
+                (\group ->
+                    column [ Element.width Element.fill, Element.spacing 16 ]
+                        [ hr
+                        , el [ Element.centerX, Font.size 18 ] (text group.title)
+                        , wrappedRow
+                            [ Element.spacing 12
+                            ]
+                            (List.map
+                                (\char -> charBlock <| String.fromChar char)
+                                group.data
+                            )
+                        ]
+                )
+                kanjiGroups
             )
         ]
 
@@ -344,6 +380,125 @@ kanaFilterGroup kanaFilter =
         ]
 
 
+viewKanjiGrouping kanjiGrouping =
+    row
+        [ Element.spacing 1
+        , Background.color Color.orangeDark
+        , Border.rounded 5
+        ]
+        [ radioButton (kanjiGrouping == Grade)
+            { onPress = Just (ChangeKanjiGrouping Grade)
+            , label = text "Grade"
+            }
+        , radioButton (kanjiGrouping == StrokeCount)
+            { onPress = Just (ChangeKanjiGrouping StrokeCount)
+            , label = text "Stroke"
+            }
+        , radioButton (kanjiGrouping == Radical)
+            { onPress = Just (ChangeKanjiGrouping Radical)
+            , label = text "Radical"
+            }
+        ]
+
+
+type alias Group a =
+    { title : String
+    , data : List a
+    }
+
+
+groupKanji : List ( Char, Kanji ) -> KanjiGrouping -> List (Group Char)
+groupKanji kanjiTuples kanjiGrouping =
+    let
+        sortingField =
+            case kanjiGrouping of
+                Grade ->
+                    .grade
+                        >> (\x ->
+                                if x == -1 then
+                                    100
+
+                                else
+                                    x
+                           )
+
+                StrokeCount ->
+                    .strokes
+
+                Radical ->
+                    .radical >> Char.toCode
+
+        foldingFn =
+            \( char, kanji ) memo ->
+                case Dict.get (sortingField kanji) memo of
+                    Just list ->
+                        Dict.insert (sortingField kanji) (char :: list) memo
+
+                    Nothing ->
+                        Dict.insert (sortingField kanji) [ char ] memo
+    in
+    kanjiTuples
+        |> List.foldl foldingFn Dict.empty
+        |> Dict.toList
+        |> List.sortBy Tuple.first
+        |> List.map
+            (\( key, group ) ->
+                { title =
+                    case kanjiGrouping of
+                        Grade ->
+                            gradeTitle group key
+
+                        StrokeCount ->
+                            strokesTitle group key
+
+                        Radical ->
+                            radicalTitle group key
+                , data = List.reverse group
+                }
+            )
+
+
+gradeTitle : List a -> Int -> String
+gradeTitle group grade =
+    let
+        groupLengthStr =
+            String.fromInt (List.length group)
+    in
+    if grade == 100 then
+        "Secondary School (" ++ groupLengthStr ++ ")"
+
+    else
+        "Grade " ++ String.fromInt grade ++ " (" ++ groupLengthStr ++ ")"
+
+
+strokesTitle : List a -> Int -> String
+strokesTitle group strokes =
+    let
+        strokesStr =
+            String.fromInt strokes
+
+        groupLengthStr =
+            String.fromInt (List.length group)
+    in
+    if strokes == 1 then
+        strokesStr ++ "stroke (" ++ groupLengthStr ++ ")"
+
+    else
+        strokesStr ++ " strokes (" ++ groupLengthStr ++ ")"
+
+
+radicalTitle : List a -> Int -> String
+radicalTitle group radical =
+    let
+        radicalStr =
+            String.fromChar (Char.fromCode radical)
+
+        groupLengthStr =
+            String.fromInt (List.length group)
+    in
+    radicalStr ++ " (" ++ groupLengthStr ++ ")"
+
+
 navBar =
     row
         [ Background.color Color.orange
@@ -353,9 +508,6 @@ navBar =
         , Element.width Element.fill
         , Element.paddingXY 64 0
         , Element.spaceEvenly
-        ]
-        [ titleText
-        , navLinks
         ]
 
 

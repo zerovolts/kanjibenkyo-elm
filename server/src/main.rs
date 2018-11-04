@@ -39,25 +39,6 @@ fn main() {
         ..Default::default()
     };
 
-    // let connection = establish_connection();
-    // let all_kana = kana::table
-    //     .limit(5)
-    //     .load::<models::kana::Kana>(&connection)
-    //     .expect("Error loading kana");
-
-    // let all_kanji = kanji::table
-    //     .limit(5)
-    //     .load::<models::kanji::Kanji>(&connection)
-    //     .expect("Error loading kanji");
-
-    // for kana in all_kana {
-    //     println!("{:?}", kana.hiragana);
-    // }
-
-    // for kanji in all_kanji {
-    //     println!("{:?}", kanji.character);
-    // }
-
     rocket::ignite()
         .manage(init_pool())
         .mount("/", routes![index])
@@ -66,13 +47,6 @@ fn main() {
         .attach(options)
         .launch();
 }
-
-// pub fn establish_connection() -> PgConnection {
-//     dotenv().ok();
-
-//     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-//     PgConnection::establish(&database_url).expect(&format!("Error connecting to {}", database_url))
-// }
 
 fn init_pool() -> dbconn::PgPool {
     dotenv().ok();
