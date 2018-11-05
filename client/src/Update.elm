@@ -54,6 +54,9 @@ update msg model =
         ChangeKanjiGrouping grouping ->
             ( { model | kanjiGrouping = grouping }, Cmd.none )
 
+        ChangeKanjiFilter text ->
+            ( { model | kanjiFilter = text }, Cmd.none )
+
         NoOp ->
             ( model, Cmd.none )
 

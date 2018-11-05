@@ -15,3 +15,4 @@ type Msg
     | AllKanjiData (Result Http.Error (List Kanji))
     | ChangeKanaCategory Category
     | ChangeKanjiGrouping KanjiGrouping
+    | ChangeKanjiFilter String

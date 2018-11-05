@@ -22,6 +22,7 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
+import Element.Keyed as Keyed
 import Element.Lazy as Lazy
 import Html exposing (node)
 import Html.Attributes exposing (href, rel)
@@ -62,7 +63,7 @@ view model =
                         kanaShowPage model.kanaDict kanaChar
 
                     KanjiIndex ->
-                        kanjiGridPage model.kanjiDict model.kanjiGrouping
+                        kanjiGridPage model.kanjiDict model.kanjiGrouping model.kanjiFilter
 
                     WordIndex ->
                         wordGridPage Dict.empty
@@ -158,15 +159,22 @@ kanaShowPage kanaDict kanaStr =
         [ el [] (text <| String.fromChar kana.hiragana) ]
 
 
-kanjiGridPage : Dict Char Kanji -> KanjiGrouping -> Element Msg
-kanjiGridPage kanjiDict kanjiGrouping =
+kanjiGridPage : Dict Char Kanji -> KanjiGrouping -> String -> Element Msg
+kanjiGridPage kanjiDict kanjiGrouping kanjiFilter =
     let
         kanjiList =
             Dict.toList kanjiDict
 
+        kanjiFiltered =
+            List.filter
+                (\( char, kanji ) ->
+                    isKanjiFiltered kanji kanjiFilter
+                )
+                kanjiList
+
         kanjiGroups : List (Group Char)
         kanjiGroups =
-            groupKanji kanjiList kanjiGrouping
+            groupKanji kanjiFiltered kanjiGrouping
     in
     column
         [ Element.width Element.fill
@@ -178,8 +186,22 @@ kanjiGridPage kanjiDict kanjiGrouping =
             , Element.spaceEvenly
             ]
             [ el [ Font.size 30 ]
-                (text ("Kanji - " ++ (String.fromInt <| List.length <| kanjiList)))
-            , viewKanjiGrouping kanjiGrouping
+                (text
+                    ("Kanji - "
+                        ++ (String.fromInt <| List.length <| kanjiFiltered)
+                        ++ " / "
+                        ++ (String.fromInt <| List.length <| kanjiList)
+                    )
+                )
+            , row [ Element.spacing 64 ]
+                [ Input.search [ Element.width (px 256) ]
+                    { text = kanjiFilter
+                    , placeholder = Just (Input.placeholder [] (text "Search all kanji"))
+                    , label = Input.labelHidden "Kanji Search"
+                    , onChange = \text -> ChangeKanjiFilter text
+                    }
+                , viewKanjiGrouping kanjiGrouping
+                ]
             ]
         , column [ Element.width Element.fill, Element.spacing 32 ]
             (List.map
@@ -191,7 +213,7 @@ kanjiGridPage kanjiDict kanjiGrouping =
                             [ Element.spacing 12
                             ]
                             (List.map
-                                (\char -> charBlock <| String.fromChar char)
+                                (\char -> charBlock WhiteBlack <| String.fromChar char)
                                 group.data
                             )
                         ]
@@ -199,6 +221,24 @@ kanjiGridPage kanjiDict kanjiGrouping =
                 kanjiGroups
             )
         ]
+
+
+isKanjiFiltered : Kanji -> String -> Bool
+isKanjiFiltered kanji kanjiFilter =
+    let
+        listMatch =
+            List.any (\field -> String.contains kanjiFilter field)
+
+        meaningsMatch =
+            listMatch kanji.meanings
+
+        onyomiMatch =
+            listMatch kanji.onyomi
+
+        kunyomiMatch =
+            listMatch kanji.kunyomi
+    in
+    meaningsMatch || onyomiMatch || kunyomiMatch
 
 
 wordGridPage words =
@@ -224,7 +264,7 @@ wordGridPage words =
             [ Element.spacing 12
             ]
             (List.map
-                (\( char, _ ) -> charBlock <| String.fromChar char)
+                (\( char, _ ) -> charBlock WhiteBlack <| String.fromChar char)
                 wordList
             )
         ]
@@ -284,7 +324,7 @@ kanaGrid kanaDict kanaFilter =
                             kana =
                                 Maybe.withDefault Kana.default (Dict.get c kanaDict)
                         in
-                        charBlock
+                        charBlock WhiteBlack
                             (case kanaFilter of
                                 Hiragana ->
                                     String.fromChar kana.hiragana
@@ -297,7 +337,7 @@ kanaGrid kanaDict kanaFilter =
                             )
 
                     Nothing ->
-                        charBlock ""
+                        charBlock WhiteBlack ""
 
         grid =
             List.reverse <|
@@ -307,16 +347,33 @@ kanaGrid kanaDict kanaFilter =
                     )
                     kanaGridTemplate
     in
-    row [ Element.spacing 12 ]
-        (List.map
-            (\col ->
-                column
-                    [ Element.spacing 12
-                    ]
-                    col
+    column [ spacing 12 ]
+        [ row [ spacing 12 ]
+            (List.map (charBlock Faded)
+                [ "nn", "w", "r", "y", "m", "h", "n", "t", "s", "k", "-" ]
             )
-            grid
-        )
+        , row
+            [ spacing 12
+            , Element.onRight
+                (column
+                    [ Element.moveRight 12
+                    , Element.spacing 12
+                    ]
+                    (List.map (charBlock Faded)
+                        [ "a", "i", "u", "e", "o" ]
+                    )
+                )
+            ]
+            (List.map
+                (\col ->
+                    column
+                        [ Element.spacing 12
+                        ]
+                        col
+                )
+                grid
+            )
+        ]
 
 
 hr =
@@ -561,20 +618,38 @@ globalStyles =
     ]
 
 
-charBlock char =
-    link
-        [ Background.color Color.white
-        , Element.width (px 48)
-        , Element.height (px 48)
-        , Border.rounded 5
-        , Font.size 24
-        , Element.pointer
-        ]
-        { url = "/kana/" ++ char
-        , label =
-            el
-                [ Element.centerX
-                , Element.centerY
-                ]
-                (text char)
-        }
+type BlockType
+    = WhiteBlack
+    | Faded
+
+
+charBlock blockType char =
+    let
+        ( backgroundColor, fontColor ) =
+            case blockType of
+                WhiteBlack ->
+                    ( Color.white, Color.text )
+
+                Faded ->
+                    ( Color.backgroundDark, Color.white )
+    in
+    Keyed.el []
+        ( char
+        , link
+            [ Background.color backgroundColor
+            , Font.color fontColor
+            , Element.width (px 48)
+            , Element.height (px 48)
+            , Border.rounded 5
+            , Font.size 24
+            , Element.pointer
+            ]
+            { url = "/kana/" ++ char
+            , label =
+                el
+                    [ Element.centerX
+                    , Element.centerY
+                    ]
+                    (text char)
+            }
+        )

@@ -22,6 +22,7 @@ type alias Model =
     , route : Route
     , kanaFilter : Category
     , kanjiGrouping : KanjiGrouping
+    , kanjiFilter : String
     }
 
 
@@ -39,6 +40,7 @@ init flags url key =
             , route = Route.toRoute url
             , kanaFilter = Hiragana
             , kanjiGrouping = Grade
+            , kanjiFilter = ""
             }
     in
     ( model
