@@ -75,38 +75,61 @@ view kanjiDict kanjiGrouping kanjiView kanjiFilter =
                 , viewKanjiGrouping kanjiGrouping
                 ]
             ]
-        , column [ Element.width Element.fill, Element.spacing 32 ]
-            (List.map
-                (\group ->
-                    column [ Element.width Element.fill, Element.spacing 16 ]
-                        [ hr
-                        , el [ Element.centerX, Font.size 18 ] (text group.title)
-                        , case kanjiView of
-                            Node ->
-                                wrappedRow
-                                    [ Element.spacing 12
-                                    ]
-                                    (List.map
-                                        (\kanji -> charBlock WhiteBlack <| String.fromChar kanji.character)
-                                        group.data
-                                    )
+        , case kanjiGrouping of
+            NoGrouping ->
+                column [ Element.spacing 24, Element.width Element.fill ]
+                    [ hr
+                    , case kanjiView of
+                        Node ->
+                            kanjiNodeGridView (Tuple.second (List.unzip kanjiFiltered))
 
-                            Card ->
-                                wrappedRow
-                                    [ Element.width Element.fill
-                                    , Element.centerX
-                                    , Element.spacing 16
-                                    , Element.spaceEvenly
-                                    ]
-                                    (List.map
-                                        (\kanji -> KanjiCard.view kanji)
-                                        group.data
-                                    )
-                        ]
-                )
-                kanjiGroups
-            )
+                        Card ->
+                            kanjiCardGridView (Tuple.second (List.unzip kanjiFiltered))
+                    ]
+
+            _ ->
+                column [ Element.width Element.fill, Element.spacing 32 ]
+                    (List.map
+                        (\group ->
+                            column [ Element.width Element.fill, Element.spacing 16 ]
+                                [ hr
+                                , el [ Element.centerX, Font.size 18 ] (text group.title)
+                                , case kanjiView of
+                                    Node ->
+                                        kanjiNodeGridView group.data
+
+                                    Card ->
+                                        kanjiCardGridView group.data
+                                ]
+                        )
+                        kanjiGroups
+                    )
         ]
+
+
+kanjiNodeGridView : List Kanji -> Element Msg
+kanjiNodeGridView kanjiList =
+    wrappedRow
+        [ Element.spacing 12
+        ]
+        (List.map
+            (\kanji -> charBlock WhiteBlack <| String.fromChar kanji.character)
+            kanjiList
+        )
+
+
+kanjiCardGridView : List Kanji -> Element Msg
+kanjiCardGridView kanjiList =
+    wrappedRow
+        [ Element.width Element.fill
+        , Element.centerX
+        , Element.spacing 16
+        , Element.spaceEvenly
+        ]
+        (List.map
+            (\kanji -> KanjiCard.view kanji)
+            kanjiList
+        )
 
 
 isKanjiFiltered : Kanji -> String -> Bool
@@ -152,7 +175,11 @@ viewKanjiGrouping kanjiGrouping =
         , Background.color Color.orangeDark
         , Border.rounded 5
         ]
-        [ radioButton (kanjiGrouping == Grade)
+        [ radioButton (kanjiGrouping == NoGrouping)
+            { onPress = Just (ChangeKanjiGrouping NoGrouping)
+            , label = text "None"
+            }
+        , radioButton (kanjiGrouping == Grade)
             { onPress = Just (ChangeKanjiGrouping Grade)
             , label = text "Grade"
             }
@@ -178,6 +205,9 @@ groupKanji kanjiTuples kanjiGrouping =
     let
         sortingField =
             case kanjiGrouping of
+                NoGrouping ->
+                    always 0
+
                 Grade ->
                     .grade
                         >> (\x ->
@@ -219,6 +249,9 @@ groupKanji kanjiTuples kanjiGrouping =
 
                         Radical ->
                             radicalTitle group key
+
+                        _ ->
+                            ""
                 , data = List.reverse group
                 }
             )

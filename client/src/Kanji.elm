@@ -16,7 +16,8 @@ type alias Kanji =
 
 
 type KanjiGrouping
-    = Grade
+    = NoGrouping
+    | Grade
     | StrokeCount
     | Radical
 
@@ -24,6 +25,10 @@ type KanjiGrouping
 type KanjiView
     = Node
     | Card
+
+
+
+-- | Table
 
 
 default : Kanji
