@@ -16,7 +16,8 @@ type alias Kanji =
 
 
 type KanjiGrouping
-    = Grade
+    = None
+    | Grade
     | StrokeCount
     | Radical
 

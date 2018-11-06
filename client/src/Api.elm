@@ -24,7 +24,7 @@ decodeKana =
         (D.field "romaji" D.string)
 
 
-getAllKanjiIfNeeded : List Char -> Cmd Msg
+getAllKanjiIfNeeded : List a -> Cmd Msg
 getAllKanjiIfNeeded kanji =
     if List.length kanji > 0 then
         Cmd.none

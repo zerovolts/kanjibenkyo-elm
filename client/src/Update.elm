@@ -22,8 +22,8 @@ update msg model =
 
         AllKanjiData (Ok kanjiList) ->
             ( { model
-                | kanji = List.map (\kanji -> kanji.character) kanjiList
-                , kanjiDict = kanjiToDict kanjiList
+                -- | kanji = List.map (\kanji -> kanji.character) kanjiList
+                | kanjiDict = kanjiToDict kanjiList
               }
             , Cmd.none
             )

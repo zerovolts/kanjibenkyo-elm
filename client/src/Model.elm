@@ -6,6 +6,7 @@ import Dict exposing (Dict)
 import Kana exposing (Category(..), Kana)
 import Kanji exposing (Kanji, KanjiGrouping(..))
 import Msg exposing (Msg(..))
+import Page.Kanji.Index as KanjiIndex
 import Route exposing (Route(..))
 import Url exposing (Url)
 import Word exposing (Word)
@@ -15,14 +16,14 @@ type alias Model =
     { kanaDict : Dict Char Kana
     , kanjiDict : Dict Char Kanji
     , wordsDict : Dict String Word
-    , kana : List Char
-    , kanji : List Char
     , url : Url
     , key : Key
     , route : Route
+    , kanjiFilter : String
     , kanaFilter : Category
     , kanjiGrouping : KanjiGrouping
-    , kanjiFilter : String
+
+    -- , page : PageData
     }
 
 
@@ -33,14 +34,14 @@ init flags url key =
             { kanaDict = Dict.empty
             , kanjiDict = Dict.empty
             , wordsDict = Dict.singleton (.word Word.default) Word.default
-            , kana = []
-            , kanji = []
             , url = url
             , key = key
             , route = Route.toRoute url
+            , kanjiFilter = ""
             , kanaFilter = Hiragana
             , kanjiGrouping = Grade
-            , kanjiFilter = ""
+
+            -- , page = HomePage
             }
     in
     ( model
@@ -52,7 +53,7 @@ fetchRouteData : Model -> Route -> Cmd Msg
 fetchRouteData model route =
     case route of
         KanjiIndex ->
-            getAllKanjiIfNeeded model.kanji
+            getAllKanjiIfNeeded (Dict.toList model.kanjiDict)
 
         KanaIndex ->
             getAllKana
