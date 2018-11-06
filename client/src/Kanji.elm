@@ -1,4 +1,4 @@
-module Kanji exposing (Kanji, KanjiGrouping(..), default, isKanji)
+module Kanji exposing (Kanji, KanjiGrouping(..), KanjiView(..), default, isKanji)
 
 import Char
 
@@ -16,10 +16,14 @@ type alias Kanji =
 
 
 type KanjiGrouping
-    = None
-    | Grade
+    = Grade
     | StrokeCount
     | Radical
+
+
+type KanjiView
+    = Node
+    | Card
 
 
 default : Kanji

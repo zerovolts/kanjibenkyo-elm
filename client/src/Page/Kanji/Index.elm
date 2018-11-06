@@ -18,9 +18,10 @@ import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
 import Element.Lazy as Lazy
-import Kanji exposing (Kanji, KanjiGrouping(..))
+import Kanji exposing (Kanji, KanjiGrouping(..), KanjiView(..))
 import Msg exposing (Msg(..))
 import Page.Basic exposing (BlockType(..), charBlock, hr, radioButton)
+import Page.Kanji.Card as KanjiCard
 
 
 type alias Model =
@@ -29,8 +30,8 @@ type alias Model =
     }
 
 
-view : Dict Char Kanji -> KanjiGrouping -> String -> Element Msg
-view kanjiDict kanjiGrouping kanjiFilter =
+view : Dict Char Kanji -> KanjiGrouping -> KanjiView -> String -> Element Msg
+view kanjiDict kanjiGrouping kanjiView kanjiFilter =
     let
         kanjiList =
             Dict.toList kanjiDict
@@ -42,7 +43,7 @@ view kanjiDict kanjiGrouping kanjiFilter =
                 )
                 kanjiList
 
-        kanjiGroups : List (Group Char)
+        kanjiGroups : List (Group Kanji)
         kanjiGroups =
             groupKanji kanjiFiltered kanjiGrouping
     in
@@ -70,6 +71,7 @@ view kanjiDict kanjiGrouping kanjiFilter =
                     , label = Input.labelHidden "Kanji Search"
                     , onChange = \text -> ChangeKanjiFilter text
                     }
+                , viewKanjiView kanjiView
                 , viewKanjiGrouping kanjiGrouping
                 ]
             ]
@@ -79,13 +81,27 @@ view kanjiDict kanjiGrouping kanjiFilter =
                     column [ Element.width Element.fill, Element.spacing 16 ]
                         [ hr
                         , el [ Element.centerX, Font.size 18 ] (text group.title)
-                        , wrappedRow
-                            [ Element.spacing 12
-                            ]
-                            (List.map
-                                (\char -> charBlock WhiteBlack <| String.fromChar char)
-                                group.data
-                            )
+                        , case kanjiView of
+                            Node ->
+                                wrappedRow
+                                    [ Element.spacing 12
+                                    ]
+                                    (List.map
+                                        (\kanji -> charBlock WhiteBlack <| String.fromChar kanji.character)
+                                        group.data
+                                    )
+
+                            Card ->
+                                wrappedRow
+                                    [ Element.width Element.fill
+                                    , Element.centerX
+                                    , Element.spacing 16
+                                    , Element.spaceEvenly
+                                    ]
+                                    (List.map
+                                        (\kanji -> KanjiCard.view kanji)
+                                        group.data
+                                    )
                         ]
                 )
                 kanjiGroups
@@ -109,6 +125,24 @@ isKanjiFiltered kanji kanjiFilter =
             listMatch kanji.kunyomi
     in
     meaningsMatch || onyomiMatch || kunyomiMatch
+
+
+viewKanjiView : KanjiView -> Element Msg
+viewKanjiView kanjiView =
+    row
+        [ Element.spacing 1
+        , Background.color Color.orangeDark
+        , Border.rounded 5
+        ]
+        [ radioButton (kanjiView == Node)
+            { onPress = Just (ChangeKanjiView Node)
+            , label = text "Node"
+            }
+        , radioButton (kanjiView == Card)
+            { onPress = Just (ChangeKanjiView Card)
+            , label = text "Card"
+            }
+        ]
 
 
 viewKanjiGrouping : KanjiGrouping -> Element Msg
@@ -139,7 +173,7 @@ type alias Group a =
     }
 
 
-groupKanji : List ( Char, Kanji ) -> KanjiGrouping -> List (Group Char)
+groupKanji : List ( Char, Kanji ) -> KanjiGrouping -> List (Group Kanji)
 groupKanji kanjiTuples kanjiGrouping =
     let
         sortingField =
@@ -164,10 +198,10 @@ groupKanji kanjiTuples kanjiGrouping =
             \( char, kanji ) memo ->
                 case Dict.get (sortingField kanji) memo of
                     Just list ->
-                        Dict.insert (sortingField kanji) (char :: list) memo
+                        Dict.insert (sortingField kanji) (kanji :: list) memo
 
                     Nothing ->
-                        Dict.insert (sortingField kanji) [ char ] memo
+                        Dict.insert (sortingField kanji) [ kanji ] memo
     in
     kanjiTuples
         |> List.foldl foldingFn Dict.empty

@@ -4,7 +4,7 @@ import Api exposing (getAllKana, getAllKanjiIfNeeded)
 import Browser.Navigation exposing (Key)
 import Dict exposing (Dict)
 import Kana exposing (Category(..), Kana)
-import Kanji exposing (Kanji, KanjiGrouping(..))
+import Kanji exposing (Kanji, KanjiGrouping(..), KanjiView(..))
 import Msg exposing (Msg(..))
 import Page.Kanji.Index as KanjiIndex
 import Route exposing (Route(..))
@@ -19,9 +19,10 @@ type alias Model =
     , url : Url
     , key : Key
     , route : Route
-    , kanjiFilter : String
     , kanaFilter : Category
+    , kanjiFilter : String
     , kanjiGrouping : KanjiGrouping
+    , kanjiView : KanjiView
 
     -- , page : PageData
     }
@@ -37,9 +38,10 @@ init flags url key =
             , url = url
             , key = key
             , route = Route.toRoute url
-            , kanjiFilter = ""
             , kanaFilter = Hiragana
+            , kanjiFilter = ""
             , kanjiGrouping = Grade
+            , kanjiView = Node
 
             -- , page = HomePage
             }

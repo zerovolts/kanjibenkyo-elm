@@ -57,6 +57,9 @@ update msg model =
         ChangeKanjiFilter text ->
             ( { model | kanjiFilter = text }, Cmd.none )
 
+        ChangeKanjiView view ->
+            ( { model | kanjiView = view }, Cmd.none )
+
         NoOp ->
             ( model, Cmd.none )
 

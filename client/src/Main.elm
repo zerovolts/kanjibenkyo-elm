@@ -49,7 +49,7 @@ view model =
                     KanaShow.view model.kanaDict kanaChar
 
                 KanjiIndex ->
-                    KanjiIndex.view model.kanjiDict model.kanjiGrouping model.kanjiFilter
+                    KanjiIndex.view model.kanjiDict model.kanjiGrouping model.kanjiView model.kanjiFilter
 
                 WordIndex ->
                     WordIndex.view Dict.empty
