@@ -21,7 +21,18 @@ table! {
     }
 }
 
+table! {
+    users (id) {
+        id -> Int4,
+        name -> Varchar,
+        email -> Varchar,
+        password_digest -> Varchar,
+        experience -> Int4,
+    }
+}
+
 allow_tables_to_appear_in_same_query!(
     kana,
     kanji,
+    users,
 );

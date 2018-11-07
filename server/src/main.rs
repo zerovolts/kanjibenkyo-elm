@@ -44,6 +44,7 @@ fn main() {
         .mount("/", routes![index])
         .mount("/kana", routes![controllers::kana::index])
         .mount("/kanji", routes![controllers::kanji::index])
+        .mount("/user", routes![controllers::user::show])
         .attach(options)
         .launch();
 }

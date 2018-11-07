@@ -8,4 +8,4 @@ CREATE TABLE kanji (
     grade integer not null,
     radical varchar not null,
     components text[] not null
-)
+);

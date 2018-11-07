@@ -1,1 +1,1 @@
-DROP TABLE kana
+DROP TABLE kana;

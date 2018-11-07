@@ -44,7 +44,20 @@ view content =
                     [ titleText
                     , navLinks
                     ]
-                , content
+                , el
+                    [ Element.height Element.fill
+                    , Element.width Element.fill
+                    ]
+                    content
+
+                -- , el
+                --     [ Element.width Element.fill
+                --     , Element.height (px 24)
+                --     , Background.color Color.backgroundDark
+                --     ]
+                --     (el [ Element.paddingXY 24 0, Element.centerY ]
+                --         (text "hello")
+                --     )
                 ]
             )
         ]

@@ -12,7 +12,7 @@ pub struct Kana {
 }
 
 impl Kana {
-    pub fn example() -> Kana {
+    pub fn mock() -> Kana {
         Kana {
             id: 0,
             hiragana: String::from("つ"),

@@ -16,6 +16,7 @@ const main = async () => {
     client.connect();
     await seedKana(client);
     await seedKanji(client);
+    await seedUsers(client);
     client.end();
     console.log("finished!");
 }
@@ -42,6 +43,7 @@ const seedKanji = async (client) => {
 
     console.log("dropping kanji...");
     await client.query("TRUNCATE kanji");
+
     console.log("seeding kanji...");
     for (const kanji of allKanji) {
         await client.query(
@@ -57,6 +59,37 @@ const seedKanji = async (client) => {
                 []
             ]
         );
+    }
+}
+
+const seedUsers = async (client) => {
+    const users = [{
+        name: "guest",
+        email: "guest@kanjibenkyo.com",
+        password_digest: "",
+        experience: 0
+    },
+    {
+        name: "guest2",
+        email: "guest2@kanjibenkyo.com",
+        password_digest: "",
+        experience: 0
+    }]
+
+    console.log("dropping users...");
+    await client.query("TRUNCATE users");
+
+    console.log("seeding users...");
+    for (const user of users) {
+        await client.query(
+            "INSERT INTO users VALUES (nextval('users_id_seq'), $1, $2, $3, $4)",
+            [
+                user.name,
+                user.email,
+                user.password_digest,
+                user.experience
+            ]
+        )
     }
 }
 

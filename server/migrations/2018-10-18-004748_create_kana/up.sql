@@ -3,4 +3,4 @@ CREATE TABLE kana (
     hiragana varchar(1) not null,
     katakana varchar(1) not null,
     romaji varchar not null 
-)
+);
