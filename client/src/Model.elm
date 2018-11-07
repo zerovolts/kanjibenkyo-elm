@@ -9,11 +9,13 @@ import Msg exposing (Msg(..))
 import Page.Kanji.Index as KanjiIndex
 import Route exposing (Route(..))
 import Url exposing (Url)
+import User exposing (User)
 import Word exposing (Word)
 
 
 type alias Model =
-    { kanaDict : Dict Char Kana
+    { user : User
+    , kanaDict : Dict Char Kana
     , kanjiDict : Dict Char Kanji
     , wordsDict : Dict String Word
     , url : Url
@@ -32,7 +34,8 @@ init : () -> Url -> Key -> ( Model, Cmd Msg )
 init flags url key =
     let
         model =
-            { kanaDict = Dict.empty
+            { user = User.default
+            , kanaDict = Dict.empty
             , kanjiDict = Dict.empty
             , wordsDict = Dict.singleton (.word Word.default) Word.default
             , url = url

@@ -18,10 +18,12 @@ import Element.Font as Font
 import Html exposing (node)
 import Html.Attributes exposing (href, rel)
 import Msg exposing (Msg)
+import Url exposing (Url)
+import User exposing (User)
 
 
-view : Element Msg -> Document Msg
-view content =
+view : Element Msg -> User -> Document Msg
+view content user =
     { title = "kanjibenkyō"
     , body =
         [ node "link"
@@ -42,7 +44,7 @@ view content =
                 ]
                 [ navBar
                     [ titleText
-                    , navLinks
+                    , row [ Element.height Element.fill, Element.spacing 24 ] [ navLinks, userNav user ]
                     ]
                 , el
                     [ Element.height Element.fill
@@ -76,6 +78,7 @@ globalStyles =
     ]
 
 
+navBar : List (Element Msg) -> Element Msg
 navBar =
     row
         [ Background.color Color.orange
@@ -88,6 +91,7 @@ navBar =
         ]
 
 
+titleText : Element Msg
 titleText =
     link
         [ Element.height Element.fill
@@ -104,6 +108,7 @@ titleText =
         }
 
 
+navLinks : Element Msg
 navLinks =
     row
         [ Font.size 20
@@ -124,3 +129,25 @@ navLink label url =
         { url = url
         , label = el [ Element.centerY ] (text label)
         }
+
+
+userNav : User -> Element Msg
+userNav user =
+    el
+        [ Element.height Element.fill
+        , Element.paddingXY 0 8
+        ]
+        (el
+            [ Background.color Color.orangeDark
+            , Border.rounded 5
+            , Element.paddingXY 12 0
+            , Element.width (px 160)
+            , Element.height Element.fill
+            , Font.color Color.white
+            ]
+            (el
+                [ Element.centerY
+                ]
+                (text user.name)
+            )
+        )

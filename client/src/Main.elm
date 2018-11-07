@@ -57,4 +57,4 @@ view model =
                 NotFound ->
                     el [] (text "Not Found!")
     in
-    Page.view content
+    Page.view content model.user
