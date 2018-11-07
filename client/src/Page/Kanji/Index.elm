@@ -65,7 +65,7 @@ view kanjiDict kanjiGrouping kanjiView kanjiFilter =
                     )
                 )
             , row [ Element.spacing 64 ]
-                [ Input.search [ Element.width (px 256) ]
+                [ Input.search [ Element.width (px 256), Element.height (px 36), Border.width 0 ]
                     { text = kanjiFilter
                     , placeholder = Just (Input.placeholder [] (text "Search all kanji"))
                     , label = Input.labelHidden "Kanji Search"
@@ -92,8 +92,11 @@ view kanjiDict kanjiGrouping kanjiView kanjiFilter =
                     (List.map
                         (\group ->
                             column [ Element.width Element.fill, Element.spacing 16 ]
-                                [ hr
-                                , el [ Element.centerX, Font.size 18 ] (text group.title)
+                                [ row [ Element.width Element.fill ]
+                                    [ hr
+                                    , el [ Element.centerX, Font.size 18, Element.paddingXY 24 0 ] (text group.title)
+                                    , hr
+                                    ]
                                 , case kanjiView of
                                     Node ->
                                         kanjiNodeGridView group.data

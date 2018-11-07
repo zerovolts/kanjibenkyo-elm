@@ -13,25 +13,27 @@ view : Kanji -> Element Msg
 view kanji =
     row
         [ Background.color Color.white
-        , Element.padding (floor ((128 - 80) / 2))
         , Border.rounded 5
-        , Element.width (px (256 + 128))
+        , Element.width (px (256 + 128 + 42))
         , Element.height (px 128)
-        , Element.spacing 16
         ]
         [ el
             [ Element.alignLeft
+            , Element.padding 24
             , Font.size 80
             ]
             (text (String.fromChar kanji.character))
         , column
-            [ -- [ Background.color Color.backgroundDark
-              Element.alignTop
-            , Element.spacing 4
+            [ Background.color Color.backgroundDark
             , Element.width Element.fill
+            , Element.height Element.fill
+            , Element.alignTop
+            , Element.spacing 4
+            , Element.padding 16
+            , Border.roundEach { topLeft = 0, topRight = 5, bottomLeft = 0, bottomRight = 5 }
             ]
-            [ tagListView Color.blue "訓読み" kanji.kunyomi
-            , tagListView Color.red "音読み" kanji.onyomi
+            [ tagListView Color.blue "kun'yomi" kanji.kunyomi
+            , tagListView Color.red "on'yomi" kanji.onyomi
             ]
         ]
 
@@ -42,7 +44,7 @@ tagListView color label strings =
         [ Element.spacing 4
         , Element.width Element.fill
         ]
-        (tagView Color.backgroundDark Color.textLight label :: List.map (tagView color Color.white) strings)
+        (tagView Color.background Color.textLight label :: List.map (tagView color Color.white) strings)
 
 
 tagView : Color -> Color -> String -> Element Msg
@@ -50,6 +52,9 @@ tagView background foreground str =
     let
         parts =
             String.split "-" str
+
+        isObsolete =
+            Tuple.first (Maybe.withDefault ( ' ', "" ) (String.uncons str)) == '（'
     in
     el
         [ Background.color background
@@ -64,5 +69,9 @@ tagView background foreground str =
                     [ text mainStr, el [ Font.color (rgba255 255 255 255 0.5) ] (text offStr) ]
 
             _ ->
-                text str
+                if isObsolete then
+                    el [ Font.color (rgba255 255 255 255 0.5) ] (text (String.slice 1 -1 str))
+
+                else
+                    text str
         )
