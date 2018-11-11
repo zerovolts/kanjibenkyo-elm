@@ -1,4 +1,4 @@
-module Model exposing (Model, fetchRouteData, init)
+module Model exposing (Cloud, Model, fetchRouteData, init)
 
 import Api exposing (getAllKana, getAllKanjiIfNeeded)
 import Browser.Navigation exposing (Key)
@@ -25,8 +25,14 @@ type alias Model =
     , kanjiFilter : String
     , kanjiGrouping : KanjiGrouping
     , kanjiView : KanjiView
+    , clouds : List Cloud
+    }
 
-    -- , page : PageData
+
+type alias Cloud =
+    { x : Float
+    , y : Float
+    , deltaX : Float
     }
 
 
@@ -45,8 +51,13 @@ init flags url key =
             , kanjiFilter = ""
             , kanjiGrouping = Grade
             , kanjiView = Node
-
-            -- , page = HomePage
+            , clouds =
+                [ { x = 0, y = 192, deltaX = 0.05 }
+                , { x = 0, y = 4, deltaX = 0.15 }
+                , { x = 0, y = 256, deltaX = -0.05 }
+                , { x = 0, y = 48, deltaX = 0.2 }
+                , { x = 0, y = 160, deltaX = -0.15 }
+                ]
             }
     in
     ( model

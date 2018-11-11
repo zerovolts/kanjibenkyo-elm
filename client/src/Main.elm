@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser exposing (Document)
+import Browser.Events exposing (onAnimationFrame)
 import Dict
 import Element exposing (el, text)
 import Model exposing (Model)
@@ -22,7 +23,7 @@ main =
         { view = view
         , init = Model.init
         , update = update
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         , onUrlChange = UrlChanged
         , onUrlRequest = LinkClicked
         }
@@ -34,7 +35,7 @@ view model =
         content =
             case model.route of
                 Home ->
-                    Home.view
+                    Home.view model.clouds
 
                 KanaIndex ->
                     KanaIndex.view model.kanaDict model.kanaFilter
@@ -58,3 +59,8 @@ view model =
                     el [] (text "Not Found!")
     in
     Page.view content model.user
+
+
+subscriptions model =
+    -- onAnimationFrame Tick
+    Sub.none

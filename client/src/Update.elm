@@ -14,6 +14,16 @@ import Url
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Tick time ->
+            ( { model
+                | clouds =
+                    List.map
+                        (\cloud -> { cloud | x = cloud.x + cloud.deltaX })
+                        model.clouds
+              }
+            , Cmd.none
+            )
+
         AllKanaData (Ok kanaList) ->
             ( { model | kanaDict = kanaToDict kanaList }, Cmd.none )
 
