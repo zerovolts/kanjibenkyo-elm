@@ -1,4 +1,10 @@
-module Kanji exposing (Kanji, KanjiGrouping(..), KanjiView(..), default, isKanji)
+module Kanji exposing
+    ( Kanji
+    , KanjiGrouping(..)
+    , KanjiView(..)
+    , default
+    , isKanji
+    )
 
 import Char
 

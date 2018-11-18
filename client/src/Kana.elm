@@ -1,6 +1,19 @@
-module Kana exposing (Category(..), Kana, VowelCategory(..), changeVowel, default, isHiragana, isKana, isKatakana, kanaGroups, vowelCategoryToIndex)
+module Kana exposing
+    ( Category(..)
+    , Kana
+    , VowelCategory(..)
+    , changeVowel
+    , default
+    , hiraganaToRomaji
+    , isHiragana
+    , isKana
+    , isKatakana
+    , kanaGroups
+    , vowelCategoryToIndex
+    )
 
 import Char
+import Dict exposing (Dict)
 
 
 type alias Kana =
@@ -117,3 +130,31 @@ changeVowel kana cat =
         |> Maybe.andThen (\x -> Just (String.slice index (index + 1) x))
         |> Maybe.andThen String.uncons
         |> Maybe.andThen (\x -> Just (Tuple.first x))
+
+
+
+-- kana -> kana.romaji
+-- いって -> itte
+-- きゅ -> kyu
+
+
+hiraganaToRomaji : Dict Char Kana -> String -> String
+hiraganaToRomaji kanaDict kanaString =
+    kanaString
+        |> String.toList
+        |> (\list -> List.map2 Tuple.pair list (List.drop 1 (list ++ [ '~' ])))
+        |> List.map
+            (\( c, nextC ) ->
+                case ( Dict.get c kanaDict, Dict.get nextC kanaDict ) of
+                    ( Just kana, _ ) ->
+                        kana.romaji
+
+                    ( Nothing, Just kana ) ->
+                        Maybe.withDefault ( ' ', "" ) (String.uncons kana.romaji)
+                            |> Tuple.first
+                            |> String.fromChar
+
+                    _ ->
+                        "~"
+            )
+        |> String.join ""

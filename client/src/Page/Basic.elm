@@ -1,4 +1,12 @@
-module Page.Basic exposing (BlockType(..), button, charBlock, hr, radioButton)
+module Page.Basic exposing
+    ( BlockType(..)
+    , button
+    , buttonCancel
+    , buttonDisabled
+    , charBlock
+    , hr
+    , radioButton
+    )
 
 import Color
 import Element exposing (Element, el, link, px, text)
@@ -67,6 +75,29 @@ button =
         , Border.rounded 5
         , Element.paddingXY 12 8
         ]
+
+
+buttonCancel : { label : Element Msg, onPress : Maybe Msg } -> Element Msg
+buttonCancel =
+    Input.button
+        [ Background.color Color.red
+        , Font.color Color.white
+        , Border.rounded 5
+        , Element.paddingXY 12 8
+        ]
+
+
+buttonDisabled : Element Msg -> Element Msg
+buttonDisabled label =
+    Input.button
+        [ Background.color Color.backgroundDark
+        , Font.color Color.white
+        , Border.rounded 5
+        , Element.paddingXY 12 8
+        ]
+        { label = label
+        , onPress = Nothing
+        }
 
 
 radioButton : Bool -> { label : Element Msg, onPress : Maybe Msg } -> Element Msg

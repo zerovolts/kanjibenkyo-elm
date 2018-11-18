@@ -1,4 +1,9 @@
-module Api exposing (decodeKanji, getAllKana, getAllKanji, getAllKanjiIfNeeded)
+module Api exposing
+    ( decodeKanji
+    , getAllKana
+    , getAllKanji
+    , getAllKanjiIfNeeded
+    )
 
 import Dict exposing (Dict)
 import Http

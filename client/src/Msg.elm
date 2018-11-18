@@ -22,3 +22,4 @@ type Msg
     | ChangeKanjiView KanjiView
     | InflectWord WordIntent
     | RemoveInflection
+    | ClearInflections

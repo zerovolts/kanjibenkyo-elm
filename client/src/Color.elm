@@ -1,4 +1,14 @@
-module Color exposing (background, backgroundDark, blue, orange, orangeDark, red, text, textLight, white)
+module Color exposing
+    ( background
+    , backgroundDark
+    , blue
+    , orange
+    , orangeDark
+    , red
+    , text
+    , textLight
+    , white
+    )
 
 import Element exposing (rgb255)
 

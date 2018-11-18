@@ -14,6 +14,10 @@ import Word exposing (pushIntent, removeIntent)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        currentWord =
+            model.currentWord
+    in
     case msg of
         Tick time ->
             ( { model
@@ -76,6 +80,9 @@ update msg model =
 
         RemoveInflection ->
             ( { model | currentWord = removeIntent model.currentWord }, Cmd.none )
+
+        ClearInflections ->
+            ( { model | currentWord = { currentWord | intents = [] } }, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )

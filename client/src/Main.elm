@@ -57,7 +57,7 @@ view model =
                     WordIndex.view Dict.empty
 
                 WordInflector ->
-                    WordInflector.view model.currentWord
+                    WordInflector.view model.kanaDict model.currentWord
 
                 NotFound ->
                     el [] (text "Not Found!")
