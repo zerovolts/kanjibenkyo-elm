@@ -10,14 +10,14 @@ import Page.Kanji.Index as KanjiIndex
 import Route exposing (Route(..))
 import Url exposing (Url)
 import User exposing (User)
-import Word exposing (Word)
+import Word exposing (BasicWord, InflectedWord)
 
 
 type alias Model =
     { user : User
     , kanaDict : Dict Char Kana
     , kanjiDict : Dict Char Kanji
-    , wordsDict : Dict String Word
+    , wordsDict : Dict String BasicWord
     , url : Url
     , key : Key
     , route : Route
@@ -26,6 +26,7 @@ type alias Model =
     , kanjiGrouping : KanjiGrouping
     , kanjiView : KanjiView
     , clouds : List Cloud
+    , currentWord : InflectedWord
     }
 
 
@@ -43,7 +44,7 @@ init flags url key =
             { user = User.default
             , kanaDict = Dict.empty
             , kanjiDict = Dict.empty
-            , wordsDict = Dict.singleton (.word Word.default) Word.default
+            , wordsDict = Dict.singleton (.root Word.default) Word.default
             , url = url
             , key = key
             , route = Route.toRoute url
@@ -58,6 +59,7 @@ init flags url key =
                 , { x = 0, y = 48, deltaX = 0.2 }
                 , { x = 0, y = 160, deltaX = -0.15 }
                 ]
+            , currentWord = Word.fromBasicWord Word.defaultGodan
             }
     in
     ( model

@@ -11,6 +11,7 @@ type Route
     | KanaShow String
     | KanjiIndex
     | WordIndex
+    | WordInflector
 
 
 routeParser : Parser (Route -> a) a
@@ -21,6 +22,7 @@ routeParser =
         , map KanaShow (s "kana" </> string)
         , map KanjiIndex (s "kanji")
         , map WordIndex (s "words")
+        , map WordInflector (s "words" </> s "inflector")
         ]
 
 

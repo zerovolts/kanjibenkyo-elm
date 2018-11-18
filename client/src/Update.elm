@@ -9,6 +9,7 @@ import Model exposing (Model, fetchRouteData)
 import Msg exposing (Msg(..))
 import Route exposing (Route(..))
 import Url
+import Word exposing (pushIntent, removeIntent)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -69,6 +70,12 @@ update msg model =
 
         ChangeKanjiView view ->
             ( { model | kanjiView = view }, Cmd.none )
+
+        InflectWord intent ->
+            ( { model | currentWord = pushIntent intent model.currentWord }, Cmd.none )
+
+        RemoveInflection ->
+            ( { model | currentWord = removeIntent model.currentWord }, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )

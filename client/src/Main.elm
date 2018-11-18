@@ -12,6 +12,7 @@ import Page.Kana.Index as KanaIndex
 import Page.Kana.Show as KanaShow
 import Page.Kanji.Index as KanjiIndex
 import Page.Word.Index as WordIndex
+import Page.Word.Inflector as WordInflector
 import Route exposing (Route(..))
 import Update exposing (update)
 import Url
@@ -54,6 +55,9 @@ view model =
 
                 WordIndex ->
                     WordIndex.view Dict.empty
+
+                WordInflector ->
+                    WordInflector.view model.currentWord
 
                 NotFound ->
                     el [] (text "Not Found!")

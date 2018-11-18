@@ -117,7 +117,7 @@ navLinks =
         , Element.height Element.fill
         , Element.pointer
         ]
-        [ navLink "Kana" "/kana", navLink "Kanji" "/kanji", navLink "Words" "/words" ]
+        [ navLink "Kana" "/kana", navLink "Kanji" "/kanji", navLink "Words" "/words/inflector" ]
 
 
 navLink label url =
