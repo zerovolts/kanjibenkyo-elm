@@ -78,6 +78,9 @@ update msg model =
         InflectWord intent ->
             ( { model | currentWord = pushIntent intent model.currentWord }, Cmd.none )
 
+        ChangeCurrentWord word ->
+            ( { model | currentWord = Word.fromBasicWord word }, Cmd.none )
+
         RemoveInflection ->
             ( { model | currentWord = removeIntent model.currentWord }, Cmd.none )
 

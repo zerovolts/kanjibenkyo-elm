@@ -2,7 +2,7 @@ module Page exposing (navBar, navLink, navLinks, titleText, view)
 
 import Browser exposing (Document)
 import Color
-import Element
+import Element as E
     exposing
         ( Element
         , column
@@ -22,8 +22,8 @@ import Url exposing (Url)
 import User exposing (User)
 
 
-view : Element Msg -> User -> Document Msg
-view content user =
+view : Element Msg -> User -> String -> Document Msg
+view content user currentPath =
     { title = "kanjibenkyō"
     , body =
         [ node "link"
@@ -36,28 +36,28 @@ view content user =
             , rel "stylesheet"
             ]
             []
-        , Element.layout
+        , E.layout
             globalStyles
             (column
-                [ Element.height Element.fill
-                , Element.width Element.fill
+                [ E.height E.fill
+                , E.width E.fill
                 ]
                 [ navBar
                     [ titleText
-                    , row [ Element.height Element.fill, Element.spacing 24 ] [ navLinks, userNav user ]
+                    , row [ E.height E.fill, E.spacing 24 ] [ navLinks currentPath, userNav user ]
                     ]
                 , el
-                    [ Element.height Element.fill
-                    , Element.width Element.fill
+                    [ E.height E.fill
+                    , E.width E.fill
                     ]
                     content
 
                 -- , el
-                --     [ Element.width Element.fill
-                --     , Element.height (px 24)
+                --     [ E.width E.fill
+                --     , E.height (px 24)
                 --     , Background.color Color.backgroundDark
                 --     ]
-                --     (el [ Element.paddingXY 24 0, Element.centerY ]
+                --     (el [ E.paddingXY 24 0, E.centerY ]
                 --         (text "hello")
                 --     )
                 ]
@@ -84,23 +84,23 @@ navBar =
         [ Background.color Color.orange
         , Border.widthEach { bottom = 4, left = 0, right = 0, top = 0 }
         , Border.color Color.orangeDark
-        , Element.height (px 52)
-        , Element.width Element.fill
-        , Element.paddingXY 64 0
-        , Element.spaceEvenly
+        , E.height (px 52)
+        , E.width E.fill
+        , E.paddingXY 64 0
+        , E.spaceEvenly
         ]
 
 
 titleText : Element Msg
 titleText =
     link
-        [ Element.height Element.fill
+        [ E.height E.fill
         ]
         { url = "/"
         , label =
             row
                 [ Font.size 26
-                , Element.pointer
+                , E.pointer
                 ]
                 [ el [] (text "漢字勉強")
                 , el [ Font.color Color.white ] (text "kanjibenkyō")
@@ -108,45 +108,53 @@ titleText =
         }
 
 
-navLinks : Element Msg
-navLinks =
+navLinks : String -> Element Msg
+navLinks currentPath =
     row
         [ Font.size 20
-        , Element.centerY
+        , E.centerY
         , Font.color Color.white
-        , Element.height Element.fill
-        , Element.pointer
+        , E.height E.fill
+        , E.pointer
         ]
-        [ navLink "Kana" "/kana", navLink "Kanji" "/kanji", navLink "Words" "/words/inflector" ]
+        [ navLink "Kana" "/kana" currentPath, navLink "Kanji" "/kanji" currentPath, navLink "Words" "/words/inflector" currentPath ]
 
 
-navLink label url =
+navLink : String -> String -> String -> Element Msg
+navLink label url currentPath =
     link
-        [ Element.mouseOver [ Background.color Color.orangeDark ]
-        , Element.height Element.fill
-        , Element.paddingXY 24 0
+        [ E.mouseOver [ Background.color Color.orangeDark ]
+        , E.height E.fill
+        , E.paddingXY 24 0
+        , Background.color
+            (if url == currentPath then
+                Color.orangeDark
+
+             else
+                Color.orange
+            )
         ]
         { url = url
-        , label = el [ Element.centerY ] (text label)
+        , label = el [ E.centerY ] (text label)
         }
 
 
 userNav : User -> Element Msg
 userNav user =
     el
-        [ Element.height Element.fill
-        , Element.paddingXY 0 8
+        [ E.height E.fill
+        , E.paddingXY 0 8
         ]
         (el
             [ Background.color Color.orangeDark
             , Border.rounded 5
-            , Element.paddingXY 12 0
-            , Element.width (px 160)
-            , Element.height Element.fill
+            , E.paddingXY 12 0
+            , E.width (px 160)
+            , E.height E.fill
             , Font.color Color.white
             ]
             (el
-                [ Element.centerY
+                [ E.centerY
                 ]
                 (text user.name)
             )

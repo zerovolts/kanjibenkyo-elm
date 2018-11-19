@@ -2,7 +2,7 @@ module Page.Kana.Index exposing (view)
 
 import Color
 import Dict exposing (Dict)
-import Element exposing (Element, column, el, row, spacing, text)
+import Element as E exposing (Element, column, el, row, spacing, text)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
@@ -19,14 +19,14 @@ type alias Model =
 view : Dict Char Kana -> Category -> Element Msg
 view kana kanaFilter =
     column
-        [ Element.width Element.shrink
-        , Element.centerX
-        , Element.padding 64
-        , Element.spacing 24
+        [ E.width E.shrink
+        , E.centerX
+        , E.padding 64
+        , E.spacing 24
         ]
         [ row
-            [ Element.width Element.fill
-            , Element.spaceEvenly
+            [ E.width E.fill
+            , E.spaceEvenly
             ]
             [ el [ Font.size 30 ]
                 (text
@@ -40,7 +40,7 @@ view kana kanaFilter =
             , kanaFilterGroup kanaFilter
             ]
         , hr
-        , el [ Element.centerX ]
+        , el [ E.centerX ]
             (kanaGrid kana kanaFilter)
         ]
 
@@ -102,10 +102,10 @@ kanaGrid kanaDict kanaFilter =
             )
         , row
             [ spacing 12
-            , Element.onRight
+            , E.onRight
                 (column
-                    [ Element.moveRight 12
-                    , Element.spacing 12
+                    [ E.moveRight 12
+                    , E.spacing 12
                     ]
                     (List.map (charBlock Faded)
                         [ "a", "i", "u", "e", "o" ]
@@ -115,7 +115,7 @@ kanaGrid kanaDict kanaFilter =
             (List.map
                 (\col ->
                     column
-                        [ Element.spacing 12
+                        [ E.spacing 12
                         ]
                         col
                 )
@@ -127,7 +127,7 @@ kanaGrid kanaDict kanaFilter =
 kanaFilterGroup : Category -> Element Msg
 kanaFilterGroup kanaFilter =
     row
-        [ Element.spacing 1
+        [ E.spacing 1
         , Background.color Color.orangeDark
         , Border.rounded 5
         ]

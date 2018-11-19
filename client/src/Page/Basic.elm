@@ -9,7 +9,7 @@ module Page.Basic exposing
     )
 
 import Color
-import Element exposing (Element, el, link, px, text)
+import Element as E exposing (Element, el, link, px, text)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
@@ -39,17 +39,17 @@ charBlock blockType char =
         , link
             [ Background.color backgroundColor
             , Font.color fontColor
-            , Element.width (px 48)
-            , Element.height (px 48)
+            , E.width (px 48)
+            , E.height (px 48)
             , Border.rounded 5
             , Font.size 24
-            , Element.pointer
+            , E.pointer
             ]
             { url = "/kana/" ++ char
             , label =
                 el
-                    [ Element.centerX
-                    , Element.centerY
+                    [ E.centerX
+                    , E.centerY
                     ]
                     (text char)
             }
@@ -59,12 +59,12 @@ charBlock blockType char =
 hr : Element Msg
 hr =
     el
-        [ Element.width Element.fill
-        , Element.height (px 3)
+        [ E.width E.fill
+        , E.height (px 3)
         , Background.color Color.backgroundDark
         , Border.rounded 5
         ]
-        Element.none
+        E.none
 
 
 button : { label : Element Msg, onPress : Maybe Msg } -> Element Msg
@@ -73,7 +73,7 @@ button =
         [ Background.color Color.orange
         , Font.color Color.white
         , Border.rounded 5
-        , Element.paddingXY 12 8
+        , E.paddingXY 12 8
         ]
 
 
@@ -83,7 +83,7 @@ buttonCancel =
         [ Background.color Color.red
         , Font.color Color.white
         , Border.rounded 5
-        , Element.paddingXY 12 8
+        , E.paddingXY 12 8
         ]
 
 
@@ -93,7 +93,7 @@ buttonDisabled label =
         [ Background.color Color.backgroundDark
         , Font.color Color.white
         , Border.rounded 5
-        , Element.paddingXY 12 8
+        , E.paddingXY 12 8
         ]
         { label = label
         , onPress = Nothing
@@ -110,12 +110,12 @@ radioButton selected =
 
             else
                 [ Background.color Color.orange
-                , Element.moveUp 4
+                , E.moveUp 4
                 ]
     in
     Input.button
         ([ Font.color Color.white
-         , Element.paddingXY 16 10
+         , E.paddingXY 16 10
          , Border.rounded 5
          ]
             ++ optionalAttributes

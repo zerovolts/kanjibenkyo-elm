@@ -76,5 +76,8 @@ fetchRouteData model route =
         KanaIndex ->
             getAllKana
 
+        WordInflector ->
+            getAllKana
+
         _ ->
             Cmd.none

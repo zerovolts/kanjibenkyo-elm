@@ -62,7 +62,7 @@ view model =
                 NotFound ->
                     el [] (text "Not Found!")
     in
-    Page.view content model.user
+    Page.view content model.user model.url.path
 
 
 subscriptions model =

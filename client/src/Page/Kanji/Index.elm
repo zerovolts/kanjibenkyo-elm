@@ -2,7 +2,7 @@ module Page.Kanji.Index exposing (Model, view)
 
 import Color
 import Dict exposing (Dict)
-import Element
+import Element as E
     exposing
         ( Element
         , column
@@ -48,13 +48,13 @@ view kanjiDict kanjiGrouping kanjiView kanjiFilter =
             groupKanji kanjiFiltered kanjiGrouping
     in
     column
-        [ Element.width Element.fill
-        , Element.padding 64
-        , Element.spacing 24
+        [ E.width E.fill
+        , E.padding 64
+        , E.spacing 24
         ]
         [ row
-            [ Element.width Element.fill
-            , Element.spaceEvenly
+            [ E.width E.fill
+            , E.spaceEvenly
             ]
             [ el [ Font.size 30 ]
                 (text
@@ -64,8 +64,8 @@ view kanjiDict kanjiGrouping kanjiView kanjiFilter =
                         ++ (String.fromInt <| List.length <| kanjiList)
                     )
                 )
-            , row [ Element.spacing 64 ]
-                [ Input.search [ Element.width (px 256), Element.height (px 36), Border.width 0 ]
+            , row [ E.spacing 64 ]
+                [ Input.search [ E.width (px 256), E.height (px 36), Border.width 0 ]
                     { text = kanjiFilter
                     , placeholder = Just (Input.placeholder [] (text "Search all kanji"))
                     , label = Input.labelHidden "Kanji Search"
@@ -77,7 +77,7 @@ view kanjiDict kanjiGrouping kanjiView kanjiFilter =
             ]
         , case kanjiGrouping of
             NoGrouping ->
-                column [ Element.spacing 24, Element.width Element.fill ]
+                column [ E.spacing 24, E.width E.fill ]
                     [ hr
                     , case kanjiView of
                         Node ->
@@ -88,13 +88,13 @@ view kanjiDict kanjiGrouping kanjiView kanjiFilter =
                     ]
 
             _ ->
-                column [ Element.width Element.fill, Element.spacing 32 ]
+                column [ E.width E.fill, E.spacing 32 ]
                     (List.map
                         (\group ->
-                            column [ Element.width Element.fill, Element.spacing 16 ]
-                                [ row [ Element.width Element.fill ]
+                            column [ E.width E.fill, E.spacing 16 ]
+                                [ row [ E.width E.fill ]
                                     [ hr
-                                    , el [ Element.centerX, Font.size 18, Element.paddingXY 24 0 ] (text group.title)
+                                    , el [ E.centerX, Font.size 18, E.paddingXY 24 0 ] (text group.title)
                                     , hr
                                     ]
                                 , case kanjiView of
@@ -113,7 +113,7 @@ view kanjiDict kanjiGrouping kanjiView kanjiFilter =
 kanjiNodeGridView : List Kanji -> Element Msg
 kanjiNodeGridView kanjiList =
     wrappedRow
-        [ Element.spacing 12
+        [ E.spacing 12
         ]
         (List.map
             (\kanji -> charBlock WhiteBlack <| String.fromChar kanji.character)
@@ -124,10 +124,10 @@ kanjiNodeGridView kanjiList =
 kanjiCardGridView : List Kanji -> Element Msg
 kanjiCardGridView kanjiList =
     wrappedRow
-        [ Element.width Element.fill
-        , Element.centerX
-        , Element.spacing 16
-        , Element.spaceEvenly
+        [ E.width E.fill
+        , E.centerX
+        , E.spacing 16
+        , E.spaceEvenly
         ]
         (List.map
             (\kanji -> KanjiCard.view kanji)
@@ -156,7 +156,7 @@ isKanjiFiltered kanji kanjiFilter =
 viewKanjiView : KanjiView -> Element Msg
 viewKanjiView kanjiView =
     row
-        [ Element.spacing 1
+        [ E.spacing 1
         , Background.color Color.orangeDark
         , Border.rounded 5
         ]
@@ -174,7 +174,7 @@ viewKanjiView kanjiView =
 viewKanjiGrouping : KanjiGrouping -> Element Msg
 viewKanjiGrouping kanjiGrouping =
     row
-        [ Element.spacing 1
+        [ E.spacing 1
         , Background.color Color.orangeDark
         , Border.rounded 5
         ]
