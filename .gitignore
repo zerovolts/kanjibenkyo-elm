@@ -2,8 +2,13 @@
 .env
 .DS_Store
 
-#server
+# server - rust
 target/
+
+# server
+.stack-work/
+server.cabal
+*~
 
 # client
 build/

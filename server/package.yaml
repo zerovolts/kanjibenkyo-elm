@@ -1,0 +1,58 @@
+name: server
+version: 0.1.0.0
+github: "zerovolts/kanjibenkyo-elm"
+license: BSD3
+author: "Zach Stone"
+maintainer: "zach@zerovolts.com"
+copyright: "2018 Zach Stone"
+
+extra-source-files:
+  - README.md
+  - ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description: Please see the README on GitHub at <https://github.com/zerovolts/kanjibenkyo-elm/server#readme>
+
+dependencies:
+  - base >= 4.7 && < 5
+  - aeson
+  - beam-core
+  - beam-postgres
+  - servant
+  - servant-server
+  - text
+  - transformers
+  - vector
+  - wai-cors
+  - warp
+
+library:
+  source-dirs: src
+
+executables:
+  server:
+    main: Main.hs
+    source-dirs: app
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - server
+
+tests:
+  server-test:
+    main: Spec.hs
+    source-dirs: test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - server

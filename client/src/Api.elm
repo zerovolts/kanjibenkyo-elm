@@ -48,14 +48,14 @@ getAllKanji =
 decodeKanji : Decoder Kanji
 decodeKanji =
     D.map8 Kanji
-        (D.field "character" D.string |> D.andThen strToChar)
-        (D.field "strokes" D.int)
-        (D.field "onyomi" (D.list D.string))
-        (D.field "kunyomi" (D.list D.string))
-        (D.field "meanings" (D.list D.string))
-        (D.field "grade" D.int)
-        (D.field "radical" D.string |> D.andThen strToChar)
-        (D.field "components" (D.list (D.string |> D.andThen strToChar)))
+        (D.field "_kanjiCharacter" D.string |> D.andThen strToChar)
+        (D.field "_kanjiStrokes" D.int)
+        (D.field "_kanjiOnyomi" (D.list D.string))
+        (D.field "_kanjiKunyomi" (D.list D.string))
+        (D.field "_kanjiMeanings" (D.list D.string))
+        (D.field "_kanjiGrade" D.int)
+        (D.field "_kanjiRadical" D.string |> D.andThen strToChar)
+        (D.field "_kanjiComponents" (D.list (D.string |> D.andThen strToChar)))
 
 
 strToChar : String -> Decoder Char
