@@ -24,9 +24,9 @@ getAllKana =
 decodeKana : Decoder Kana
 decodeKana =
     D.map3 Kana
-        (D.field "hiragana" D.string |> D.andThen strToChar)
-        (D.field "katakana" D.string |> D.andThen strToChar)
-        (D.field "romaji" D.string)
+        (D.field "_kanaHiragana" D.string |> D.andThen strToChar)
+        (D.field "_kanaKatakana" D.string |> D.andThen strToChar)
+        (D.field "_kanaRomaji" D.string)
 
 
 getAllKanjiIfNeeded : List a -> Cmd Msg

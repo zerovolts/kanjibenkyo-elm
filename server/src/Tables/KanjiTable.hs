@@ -14,23 +14,23 @@ import Database.Beam
 import GHC.Generics (Generic)
 
 data KanjiTable f = Kanji
-  { _kanjiId :: Columnar f Int
-  , _kanjiCharacter :: Columnar f Text
-  , _kanjiRadical :: Columnar f Text
-  , _kanjiKunyomi :: Columnar f (Vector Text)
-  , _kanjiOnyomi :: Columnar f (Vector Text)
-  , _kanjiMeanings :: Columnar f (Vector Text)
-  , _kanjiComponents :: Columnar f (Vector Text)
-  , _kanjiStrokes :: Columnar f Int
-  , _kanjiGrade :: Columnar (Nullable f) Int
-  } deriving stock (Generic)
-    deriving anyclass (Beamable)
+    { _kanjiId :: Columnar f Int
+    , _kanjiCharacter :: Columnar f Text
+    , _kanjiRadical :: Columnar f Text
+    , _kanjiKunyomi :: Columnar f (Vector Text)
+    , _kanjiOnyomi :: Columnar f (Vector Text)
+    , _kanjiMeanings :: Columnar f (Vector Text)
+    , _kanjiComponents :: Columnar f (Vector Text)
+    , _kanjiStrokes :: Columnar f Int
+    , _kanjiGrade :: Columnar (Nullable f) Int
+    } deriving stock (Generic)
+      deriving anyclass (Beamable)
 
 instance ToJSON (KanjiTable Identity) -- fill this in
 
 instance Table KanjiTable where
-  data PrimaryKey KanjiTable f = KanjiId (Columnar f Int)
-    deriving stock Generic
-    deriving anyclass Beamable
-  primaryKey :: KanjiTable column -> PrimaryKey KanjiTable column
-  primaryKey x = KanjiId (_kanjiId x)
+    data PrimaryKey KanjiTable f = KanjiId (Columnar f Int)
+        deriving stock (Generic)
+        deriving anyclass (Beamable)
+    primaryKey :: KanjiTable column -> PrimaryKey KanjiTable column
+    primaryKey x = KanjiId (_kanjiId x)
