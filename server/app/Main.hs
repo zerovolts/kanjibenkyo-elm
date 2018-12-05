@@ -30,6 +30,16 @@ type SimpleAPI (name :: Symbol) a i = name :>
     :<|> Capture "id" i :> Get '[JSON] a
     )
 
+main :: IO ()
+main = do
+    conn <- connectPostgreSQL "host='localhost' port='5432' dbname='kanjibenkyo'"
+    startServer conn 8000
+
+startServer :: Connection -> Port -> IO ()
+startServer conn port =
+    run port $ simpleCors (serve (Proxy :: Proxy API) (server conn))
+
+
 server :: Connection -> ServerT API Handler
 server conn = hoistServer
     (Proxy :: Proxy API)
@@ -66,15 +76,6 @@ getAllKanji :: ReaderT Connection Handler [KanjiTable Identity]
 getAllKanji = do
     conn <- ask
     liftIO $ runBeamPostgresDebug putStrLn conn $ runSelectReturningList $ select $ all_ (dbKanjiTable myDatabase)
-
-startServer :: Connection -> Port -> IO ()
-startServer conn port =
-    run port $ simpleCors (serve (Proxy :: Proxy API) (server conn))
-
-main :: IO ()
-main = do
-    conn <- connectPostgreSQL "host='localhost' port='5432' dbname='kanjibenkyo'"
-    startServer conn 8000
 
 data MyDatabase f = MyDatabase
     { dbKanaTable :: f (TableEntity KanaTable)

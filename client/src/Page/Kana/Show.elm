@@ -43,7 +43,14 @@ view kanaDict kanaChar =
                 , E.alignTop
                 ]
                 (List.map (charBlock WhiteBlack)
-                    [ String.fromChar kana.hiragana, String.fromChar kana.katakana, kana.romaji ]
+                    [ String.fromChar kana.hiragana
+                    , kana.katakana
+                        |> Kana.fromKatakana kanaDict
+                        |> Maybe.withDefault Kana.default
+                        |> .hiragana
+                        |> String.fromChar
+                    , kana.romaji
+                    ]
                 )
             ]
         ]

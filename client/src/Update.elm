@@ -7,6 +7,7 @@ import Kana exposing (Kana)
 import Kanji exposing (Kanji)
 import Model exposing (Model, fetchRouteData)
 import Msg exposing (Msg(..))
+import Ports
 import Route exposing (Route(..))
 import Url
 import Word exposing (pushIntent, removeIntent)
@@ -30,7 +31,9 @@ update msg model =
             )
 
         AllKanaData (Ok kanaList) ->
-            ( { model | kanaDict = kanaToDict kanaList }, Cmd.none )
+            ( { model | kanaDict = kanaToDict kanaList }
+            , Cmd.none
+            )
 
         AllKanaData (Err _) ->
             ( model, Cmd.none )
@@ -76,10 +79,18 @@ update msg model =
             ( { model | kanjiView = view }, Cmd.none )
 
         InflectWord intent ->
-            ( { model | currentWord = pushIntent intent model.currentWord }, Cmd.none )
+            let
+                inflected =
+                    pushIntent intent model.currentWord
+            in
+            ( { model | currentWord = inflected }
+            , Ports.speakWord (Word.toString inflected)
+            )
 
         ChangeCurrentWord word ->
-            ( { model | currentWord = Word.fromBasicWord word }, Cmd.none )
+            ( { model | currentWord = Word.fromBasicWord word }
+            , Ports.speakWord (Word.toString (Word.fromBasicWord word))
+            )
 
         RemoveInflection ->
             ( { model | currentWord = removeIntent model.currentWord }, Cmd.none )

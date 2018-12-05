@@ -4,6 +4,7 @@ module Kana exposing
     , VowelCategory(..)
     , changeVowel
     , default
+    , fromKatakana
     , hiraganaToRomaji
     , isHiragana
     , isKana
@@ -75,6 +76,22 @@ vowelCategoryToIndex cat =
 
         O ->
             4
+
+
+
+-- fromStr : String -> Maybe Kana
+-- fromStr kana =
+
+
+fromKatakana : Dict Char Kana -> Char -> Maybe Kana
+fromKatakana allKana katakana =
+    Dict.values allKana
+        |> List.filter (\kana -> kana.katakana == katakana)
+        |> List.head
+
+
+
+-- fromRomaji : Dict String Kana -> String -> Maybe Kana
 
 
 isKana : Char -> Bool
