@@ -8,6 +8,7 @@ module Api exposing
 import Dict exposing (Dict)
 import Http
 import Json.Decode as D exposing (Decoder)
+import Json.Decode.Pipeline as DP
 import Kana exposing (Kana)
 import Kanji exposing (Kanji)
 import Msg exposing (Msg(..))
@@ -23,10 +24,10 @@ getAllKana =
 
 decodeKana : Decoder Kana
 decodeKana =
-    D.map3 Kana
-        (D.field "_kanaHiragana" D.string |> D.andThen strToChar)
-        (D.field "_kanaKatakana" D.string |> D.andThen strToChar)
-        (D.field "_kanaRomaji" D.string)
+    D.succeed Kana
+        |> DP.required "_kanaHiragana" char
+        |> DP.required "_kanaKatakana" char
+        |> DP.required "_kanaRomaji" D.string
 
 
 getAllKanjiIfNeeded : List a -> Cmd Msg
@@ -47,21 +48,31 @@ getAllKanji =
 
 decodeKanji : Decoder Kanji
 decodeKanji =
-    D.map8 Kanji
-        (D.field "_kanjiCharacter" D.string |> D.andThen strToChar)
-        (D.field "_kanjiStrokes" D.int)
-        (D.field "_kanjiOnyomi" (D.list D.string))
-        (D.field "_kanjiKunyomi" (D.list D.string))
-        (D.field "_kanjiMeanings" (D.list D.string))
-        (D.field "_kanjiGrade" D.int)
-        (D.field "_kanjiRadical" D.string |> D.andThen strToChar)
-        (D.field "_kanjiComponents" (D.list (D.string |> D.andThen strToChar)))
+    D.succeed Kanji
+        |> DP.required "_kanjiCharacter" char
+        |> DP.required "_kanjiStrokes" D.int
+        |> DP.required "_kanjiOnyomi" (D.list D.string)
+        |> DP.required "_kanjiKunyomi" (D.list D.string)
+        |> DP.required "_kanjiMeanings" (D.list D.string)
+        |> DP.required "_kanjiGrade" D.int
+        |> DP.required "_kanjiRadical" char
+        |> DP.required "_kanjiComponents" (D.list char)
 
 
-strToChar : String -> Decoder Char
-strToChar str =
-    str
-        |> String.uncons
-        |> Maybe.andThen (\tuple -> Just (Tuple.first tuple))
-        |> Maybe.withDefault 'x'
-        |> D.succeed
+char : Decoder Char
+char =
+    D.string |> D.andThen convertChar
+
+
+convertChar : String -> Decoder Char
+convertChar str =
+    let
+        convert =
+            String.uncons >> Maybe.andThen (\tuple -> Just (Tuple.first tuple))
+    in
+    case convert str of
+        Just c ->
+            D.succeed c
+
+        Nothing ->
+            D.fail "Failed to decode char"
