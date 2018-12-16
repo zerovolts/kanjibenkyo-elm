@@ -11,6 +11,7 @@ import Page.Home as Home
 import Page.Kana.Index as KanaIndex
 import Page.Kana.Show as KanaShow
 import Page.Kanji.Index as KanjiIndex
+import Page.Kanji.Show as KanjiShow
 import Page.Word.Index as WordIndex
 import Page.Word.Inflector as WordInflector
 import Route exposing (Route(..))
@@ -45,13 +46,22 @@ view model =
                     let
                         ( kanaChar, _ ) =
                             Maybe.withDefault
-                                (Tuple.pair 'a' "")
+                                (Tuple.pair ' ' "")
                                 (String.uncons (Maybe.withDefault "" (Url.percentDecode kanaStr)))
                     in
                     KanaShow.view model.kanaDict kanaChar
 
                 KanjiIndex ->
                     KanjiIndex.view model.kanjiDict model.kanjiGrouping model.kanjiView model.kanjiFilter
+
+                KanjiShow kanjiStr ->
+                    let
+                        ( kanjiChar, _ ) =
+                            Maybe.withDefault
+                                (Tuple.pair ' ' "")
+                                (String.uncons (Maybe.withDefault "" (Url.percentDecode kanjiStr)))
+                    in
+                    KanjiShow.view model.kanjiDict kanjiChar
 
                 WordIndex ->
                     WordIndex.view Dict.empty

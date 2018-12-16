@@ -6,7 +6,7 @@ import Kana exposing (Category, Kana)
 import Kanji exposing (Kanji, KanjiGrouping, KanjiView)
 import Time exposing (Posix)
 import Url exposing (Url)
-import Word exposing (BasicWord, WordIntent)
+import Word exposing (BasicWord, InflectedWord, WordIntent)
 
 
 type Msg
@@ -24,3 +24,4 @@ type Msg
     | InflectWord WordIntent
     | RemoveInflection
     | ClearInflections
+    | Speak String

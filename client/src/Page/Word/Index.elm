@@ -4,12 +4,12 @@ import Dict exposing (Dict)
 import Element as E exposing (Element, column, el, row, text, wrappedRow)
 import Element.Font as Font
 import Msg exposing (Msg(..))
-import Page.Basic exposing (BlockType(..), button, charBlock, hr)
+import Page.Basic exposing (button, hr, kanaBlock)
 import Word exposing (BasicWord, InflectedWord, WordIntent(..))
 
 
 view : Dict String BasicWord -> Element Msg
-view words  =
+view words =
     let
         wordList =
             Dict.toList words
@@ -32,7 +32,7 @@ view words  =
             [ E.spacing 12
             ]
             (List.map
-                (\( root, _ ) -> charBlock WhiteBlack root)
+                (\( root, _ ) -> kanaBlock root)
                 wordList
             )
         ]

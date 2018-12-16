@@ -7,6 +7,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Kanji exposing (Kanji)
 import Msg exposing (Msg)
+import Page.Kanji.YomiTag as YomiTag
 
 
 view : Kanji -> Element Msg
@@ -44,34 +45,6 @@ tagListView color label strings =
         [ E.spacing 4
         , E.width E.fill
         ]
-        (tagView Color.background Color.textLight label :: List.map (tagView color Color.white) strings)
-
-
-tagView : Color -> Color -> String -> Element Msg
-tagView background foreground str =
-    let
-        parts =
-            String.split "-" str
-
-        isObsolete =
-            Tuple.first (Maybe.withDefault ( ' ', "" ) (String.uncons str)) == '（'
-    in
-    el
-        [ Background.color background
-        , Font.color foreground
-        , Font.size 14
-        , E.padding 4
-        , Border.rounded 5
-        ]
-        (case parts of
-            mainStr :: offStr :: _ ->
-                row []
-                    [ text mainStr, el [ Font.color (rgba255 255 255 255 0.5) ] (text offStr) ]
-
-            _ ->
-                if isObsolete then
-                    el [ Font.color (rgba255 255 255 255 0.5) ] (text (String.slice 1 -1 str))
-
-                else
-                    text str
+        (YomiTag.view Color.background Color.textLight label
+            :: List.map (YomiTag.view color Color.white) strings
         )

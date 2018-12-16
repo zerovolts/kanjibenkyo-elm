@@ -10,7 +10,7 @@ import Msg exposing (Msg(..))
 import Ports
 import Route exposing (Route(..))
 import Url
-import Word exposing (pushIntent, removeIntent)
+import Word exposing (BasicWord, InflectedWord, pushIntent, removeIntent)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -84,12 +84,12 @@ update msg model =
                     pushIntent intent model.currentWord
             in
             ( { model | currentWord = inflected }
-            , Ports.speakWord (Word.toString inflected)
+            , speakWord inflected
             )
 
         ChangeCurrentWord word ->
             ( { model | currentWord = Word.fromBasicWord word }
-            , Ports.speakWord (Word.toString (Word.fromBasicWord word))
+            , speakWord (Word.fromBasicWord word)
             )
 
         RemoveInflection ->
@@ -98,8 +98,16 @@ update msg model =
         ClearInflections ->
             ( { model | currentWord = { currentWord | intents = [] } }, Cmd.none )
 
+        Speak str ->
+            ( model, Ports.speakWord str )
+
         NoOp ->
             ( model, Cmd.none )
+
+
+speakWord : InflectedWord -> Cmd msg
+speakWord =
+    Word.toString >> Ports.speakWord
 
 
 kanaToDict : List Kana -> Dict Char Kana

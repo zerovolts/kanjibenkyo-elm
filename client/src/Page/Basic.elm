@@ -5,17 +5,19 @@ module Page.Basic exposing
     , buttonDisabled
     , charBlock
     , hr
+    , kanaBlock
+    , kanjiBlock
     , radioButton
+    , tag
     )
 
 import Color
-import Element as E exposing (Element, el, link, px, text)
+import Element as E exposing (Color, Element, el, link, px, text)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
 import Element.Input as Input
 import Element.Keyed as Keyed
-import Msg exposing (Msg)
 
 
 type BlockType
@@ -23,8 +25,18 @@ type BlockType
     | Faded
 
 
-charBlock : BlockType -> String -> Element Msg
-charBlock blockType char =
+kanjiBlock : String -> Element msg
+kanjiBlock kanji =
+    charBlock "/kanji/" WhiteBlack kanji
+
+
+kanaBlock : String -> Element msg
+kanaBlock kana =
+    charBlock "/kana/" WhiteBlack kana
+
+
+charBlock : String -> BlockType -> String -> Element msg
+charBlock urlPrefix blockType char =
     let
         ( backgroundColor, fontColor ) =
             case blockType of
@@ -41,11 +53,11 @@ charBlock blockType char =
             , Font.color fontColor
             , E.width (px 48)
             , E.height (px 48)
+            , E.pointer
             , Border.rounded 5
             , Font.size 24
-            , E.pointer
             ]
-            { url = "/kana/" ++ char
+            { url = urlPrefix ++ char
             , label =
                 el
                     [ E.centerX
@@ -56,7 +68,7 @@ charBlock blockType char =
         )
 
 
-hr : Element Msg
+hr : Element msg
 hr =
     el
         [ E.width E.fill
@@ -67,7 +79,7 @@ hr =
         E.none
 
 
-button : { label : Element Msg, onPress : Maybe Msg } -> Element Msg
+button : { label : Element msg, onPress : Maybe msg } -> Element msg
 button =
     Input.button
         [ Background.color Color.orange
@@ -77,7 +89,7 @@ button =
         ]
 
 
-buttonCancel : { label : Element Msg, onPress : Maybe Msg } -> Element Msg
+buttonCancel : { label : Element msg, onPress : Maybe msg } -> Element msg
 buttonCancel =
     Input.button
         [ Background.color Color.red
@@ -87,7 +99,7 @@ buttonCancel =
         ]
 
 
-buttonDisabled : Element Msg -> Element Msg
+buttonDisabled : Element msg -> Element msg
 buttonDisabled label =
     Input.button
         [ Background.color Color.backgroundDark
@@ -100,7 +112,7 @@ buttonDisabled label =
         }
 
 
-radioButton : Bool -> { label : Element Msg, onPress : Maybe Msg } -> Element Msg
+radioButton : Bool -> { label : Element msg, onPress : Maybe msg } -> Element msg
 radioButton selected =
     let
         optionalAttributes =
@@ -120,3 +132,14 @@ radioButton selected =
          ]
             ++ optionalAttributes
         )
+
+
+tag : Color -> Color -> Element msg -> Element msg
+tag background foreground =
+    el
+        [ Background.color background
+        , Font.color foreground
+        , Font.size 14
+        , E.padding 4
+        , Border.rounded 5
+        ]

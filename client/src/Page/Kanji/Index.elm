@@ -20,7 +20,7 @@ import Element.Keyed as Keyed
 import Element.Lazy as Lazy
 import Kanji exposing (Kanji, KanjiGrouping(..), KanjiView(..))
 import Msg exposing (Msg(..))
-import Page.Basic exposing (BlockType(..), charBlock, hr, radioButton)
+import Page.Basic exposing (hr, kanjiBlock, radioButton)
 import Page.Kanji.Card as KanjiCard
 
 
@@ -116,7 +116,7 @@ kanjiNodeGridView kanjiList =
         [ E.spacing 12
         ]
         (List.map
-            (\kanji -> charBlock WhiteBlack <| String.fromChar kanji.character)
+            (\kanji -> kanjiBlock <| String.fromChar kanji.character)
             kanjiList
         )
 

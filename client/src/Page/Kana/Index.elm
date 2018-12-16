@@ -8,7 +8,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Kana exposing (Category(..), Kana)
 import Msg exposing (Msg(..))
-import Page.Basic exposing (BlockType(..), charBlock, hr, radioButton)
+import Page.Basic as Basic exposing (charBlock, hr, kanaBlock, radioButton)
 
 
 type alias Model =
@@ -72,7 +72,7 @@ kanaGrid kanaDict kanaFilter =
                             kana =
                                 Maybe.withDefault Kana.default (Dict.get c kanaDict)
                         in
-                        charBlock WhiteBlack
+                        kanaBlock
                             (case kanaFilter of
                                 Hiragana ->
                                     String.fromChar kana.hiragana
@@ -85,7 +85,7 @@ kanaGrid kanaDict kanaFilter =
                             )
 
                     Nothing ->
-                        charBlock WhiteBlack ""
+                        kanaBlock ""
 
         grid =
             List.reverse <|
@@ -97,7 +97,7 @@ kanaGrid kanaDict kanaFilter =
     in
     column [ spacing 12 ]
         [ row [ spacing 12 ]
-            (List.map (charBlock Faded)
+            (List.map (charBlock "/kana/" Basic.Faded)
                 [ "nn", "w", "r", "y", "m", "h", "n", "t", "s", "k", "-" ]
             )
         , row
@@ -107,7 +107,7 @@ kanaGrid kanaDict kanaFilter =
                     [ E.moveRight 12
                     , E.spacing 12
                     ]
-                    (List.map (charBlock Faded)
+                    (List.map (charBlock "/kana/" Basic.Faded)
                         [ "a", "i", "u", "e", "o" ]
                     )
                 )

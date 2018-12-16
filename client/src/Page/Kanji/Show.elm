@@ -1,4 +1,4 @@
-module Page.Kana.Show exposing (view)
+module Page.Kanji.Show exposing (view)
 
 import Color
 import Dict exposing (Dict)
@@ -7,16 +7,15 @@ import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
-import Kana exposing (Kana)
+import Kanji exposing (Kanji)
 import Msg exposing (Msg)
-import Page.Basic exposing (kanaBlock)
 
 
-view : Dict Char Kana -> Char -> Element Msg
-view kanaDict kanaChar =
+view : Dict Char Kanji -> Char -> Element Msg
+view kanjiDict kanjiChar =
     let
-        kana =
-            Maybe.withDefault Kana.default (Dict.get kanaChar kanaDict)
+        kanji =
+            Maybe.withDefault Kanji.default (Dict.get kanjiChar kanjiDict)
     in
     column
         [ E.width E.fill
@@ -33,23 +32,13 @@ view kanaDict kanaChar =
                 , E.height (px 128)
                 , E.pointer
                 , Font.size 80
-                , Events.onClick (Msg.Speak <| String.fromChar kanaChar)
+                , Events.onClick (Msg.Speak <| String.fromChar kanjiChar)
                 ]
                 (el
                     [ E.centerX
                     , E.centerY
                     ]
-                    (text (String.fromChar kanaChar))
-                )
-            , row
-                [ E.spacing 12
-                , E.alignTop
-                ]
-                (List.map kanaBlock
-                    [ kana.hiragana |> String.fromChar
-                    , kana.katakana |> String.fromChar
-                    , kana.romaji
-                    ]
+                    (text (String.fromChar kanjiChar))
                 )
             ]
         ]
