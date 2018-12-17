@@ -7,6 +7,7 @@ import Kana exposing (Category(..), Kana)
 import Kanji exposing (Kanji, KanjiGrouping(..), KanjiView(..))
 import Msg exposing (Msg(..))
 import Page.Kanji.Index as KanjiIndex
+import Page.Kanji.Show as KanjiShow
 import Route exposing (Route(..))
 import Url exposing (Url)
 import User exposing (User)
@@ -71,6 +72,9 @@ fetchRouteData : Model -> Route -> Cmd Msg
 fetchRouteData model route =
     case route of
         KanjiIndex ->
+            getAllKanjiIfNeeded (Dict.toList model.kanjiDict)
+
+        KanjiShow _ ->
             getAllKanjiIfNeeded (Dict.toList model.kanjiDict)
 
         KanaIndex ->

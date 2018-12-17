@@ -1,5 +1,6 @@
 module Page.Basic exposing
     ( BlockType(..)
+    , basicTag
     , button
     , buttonCancel
     , buttonDisabled
@@ -9,10 +10,11 @@ module Page.Basic exposing
     , kanjiBlock
     , radioButton
     , tag
+    , tagList
     )
 
 import Color
-import Element as E exposing (Color, Element, el, link, px, text)
+import Element as E exposing (Color, Element, el, link, px, text, wrappedRow)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
@@ -143,3 +145,13 @@ tag background foreground =
         , E.padding 4
         , Border.rounded 5
         ]
+
+
+tagList : List (Element msg) -> Element msg
+tagList tags =
+    wrappedRow [ E.width E.fill, E.spacing 6 ] tags
+
+
+basicTag : Element msg -> Element msg
+basicTag =
+    tag Color.backgroundDark Color.text

@@ -8,7 +8,7 @@ import Element.Border as Border
 import Element.Font as Font
 import Kana exposing (Kana, hiraganaToRomaji)
 import Msg exposing (Msg(..))
-import Page.Basic exposing (button, buttonCancel, buttonDisabled, hr, radioButton)
+import Page.Basic as Basic exposing (button, buttonCancel, buttonDisabled, hr, radioButton)
 import Word exposing (InflectedWord)
 
 
@@ -70,12 +70,16 @@ view kanaDict word =
             (text (hiraganaToRomaji kanaDict (Word.toKanaString word)))
         , hr
         , el [ E.spacing 8 ]
-            (text
+            (Basic.tagList
                 (if word.intents == [] then
-                    "Dictionary Form (No Inflections)"
+                    [ Basic.basicTag (text "Dictionary Form (No Inflections)") ]
 
                  else
-                    String.join " → " (List.map Word.intentToString (List.reverse word.intents))
+                    List.intersperse (text "→")
+                        (List.map
+                            (Word.intentToString >> text >> Basic.basicTag)
+                            (List.reverse word.intents)
+                        )
                 )
             )
         , wrappedRow [ E.spacing 8 ]

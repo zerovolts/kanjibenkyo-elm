@@ -47,8 +47,6 @@ view clouds =
         [ E.height E.fill
         , E.width E.fill
         , Background.gradient { angle = 0, steps = [ Color.background, E.rgb255 202 234 245 ] }
-
-        -- , E.behindContent (row [] [ cloudView (unit 16) (unit 8), cloudView (unit 24) (unit 0), cloudView (unit 32) (unit 6) ])
         , E.behindContent (row [ E.spacing 192 ] (List.map (\cloud -> cloudView cloud.x cloud.y) clouds))
         ]
         [ row
