@@ -1,12 +1,14 @@
 module Word exposing
-    ( BasicWord
+    ( BaseWord
+    , DictionaryWord
     , InflectedWord
+    , Intent(..)
     , WordCategory(..)
-    , WordIntent(..)
     , allIntents
     , default
     , defaultGodan
-    , fromBasicWord
+    , dictionaryToBaseWord
+    , fromBaseWord
     , getKanji
     , intentToCategory
     , intentToString
@@ -24,33 +26,84 @@ import Kana exposing (VowelCategory)
 import Kanji exposing (Kanji)
 
 
-type alias BasicWord =
+type alias BaseWord =
+    -- represents a grammatical word base devoid of meaning or other metadata
+    -- contains only enough information to form inflections
+    -- is not necessarily in dictionary form
     { root : String
-    , kana : String
+    , furigana : String
+    , category : WordCategory
+    }
+
+
+type alias DictionaryWord =
+    -- represents a word that could be found in a dictionary
+    -- should never be inflected
+    { root : String
+    , furigana : String
     , category : WordCategory
     , meanings : List String
+    , isContentWord : Bool
     }
 
 
-default : BasicWord
+type alias InflectedWord =
+    { word : BaseWord
+    , intents : List Intent
+    }
+
+
+type
+    Intent
+    -- intents that facilitate derivational affixes
+    = Negative -- 話さない
+    | Desire -- 話したい
+    | Past -- 話した
+      -- TODO: Conjunctive is an inflectional intent
+    | Conjunctive -- 話して
+    | Potential -- 話せる
+    | Progressive -- 話している
+    | Volitional -- 話そう
+      -- | NaturalConsequence --
+      -- | GeneralConditional --
+      -- | ContextualConditional --
+    | PastConditional -- 話したら・ば
+    | Polite -- 話します
+
+
+type WordCategory
+    = Godan
+    | Ichidan
+    | IAdj
+    | NaAdj
+    | TaForm
+    | TeForm
+    | VolitionalForm
+    | PastConditionalForm
+    | MasuForm
+
+
+default : DictionaryWord
 default =
     { root = "見る"
-    , kana = "みる"
+    , furigana = "みる"
     , category = Ichidan
     , meanings = [ "to see" ]
+    , isContentWord = True
     }
 
 
-defaultGodan : BasicWord
+defaultGodan : DictionaryWord
 defaultGodan =
     { root = "話す"
-    , kana = "はなす"
+    , furigana = "はなす"
     , category = Godan
     , meanings = [ "to go" ]
+    , isContentWord = True
     }
 
 
-getKanji : Dict Char Kanji -> BasicWord -> List Kanji
+getKanji : Dict Char Kanji -> BaseWord -> List Kanji
 getKanji allKanjiDict word =
     word.root
         |> String.toList
@@ -67,42 +120,9 @@ getKanji allKanjiDict word =
             []
 
 
-type alias InflectedWord =
-    { word : BasicWord
-    , intents : List WordIntent
-    }
-
-
-type WordIntent
-    = Negative -- 話さない
-    | Desire -- 話したい
-    | Past -- 話した
-    | Conjunctive -- 話して
-    | Potential -- 話せる
-    | Progressive -- 話している
-    | Volitional -- 話そう
-      -- | NaturalConsequence --
-      -- | GeneralConditional --
-      -- | ContextualConditional --
-    | PastConditional -- 話したら・ば
-    | Polite -- 話します
-
-
-allIntents : List WordIntent
+allIntents : List Intent
 allIntents =
     [ Negative, Desire, Past, Conjunctive, Potential, Progressive, Volitional, PastConditional, Polite ]
-
-
-type WordCategory
-    = Godan
-    | Ichidan
-    | IAdj
-    | NaAdj
-    | TaForm
-    | TeForm
-    | VolitionalForm
-    | PastConditionalForm
-    | MasuForm
 
 
 mostRecentCategory : InflectedWord -> WordCategory
@@ -115,7 +135,11 @@ mostRecentCategory word =
             intentToCategory category
 
 
-intentToString : WordIntent -> String
+dictionaryToBaseWord word =
+    BaseWord word.root word.furigana word.category
+
+
+intentToString : Intent -> String
 intentToString intent =
     case intent of
         Negative ->
@@ -146,7 +170,7 @@ intentToString intent =
             "Polite"
 
 
-categoryToValidIntents : WordCategory -> List WordIntent
+categoryToValidIntents : WordCategory -> List Intent
 categoryToValidIntents category =
     case category of
         Godan ->
@@ -172,25 +196,25 @@ categoryToValidIntents category =
             []
 
 
-wordToValidIntents : InflectedWord -> List WordIntent
+wordToValidIntents : InflectedWord -> List Intent
 wordToValidIntents word =
     categoryToValidIntents (mostRecentCategory word)
 
 
-fromBasicWord : BasicWord -> InflectedWord
-fromBasicWord word =
+fromBaseWord : BaseWord -> InflectedWord
+fromBaseWord word =
     { word = word
     , intents = []
     }
 
 
-isIntentValid : WordIntent -> WordCategory -> Bool
+isIntentValid : Intent -> WordCategory -> Bool
 isIntentValid intent category =
     categoryToValidIntents category
         |> List.member intent
 
 
-intentToCategory : WordIntent -> WordCategory
+intentToCategory : Intent -> WordCategory
 intentToCategory intent =
     case intent of
         Negative ->
@@ -221,7 +245,7 @@ intentToCategory intent =
             MasuForm
 
 
-pushIntent : WordIntent -> InflectedWord -> InflectedWord
+pushIntent : Intent -> InflectedWord -> InflectedWord
 pushIntent intent word =
     if isIntentValid intent (mostRecentCategory word) then
         { word | intents = intent :: word.intents }
@@ -247,14 +271,14 @@ toString word =
 
 toKanaString : InflectedWord -> String
 toKanaString word =
-    List.foldr inflect word.word word.intents |> .kana
+    List.foldr inflect word.word word.intents |> .furigana
 
 
 
 -- Inflection Handlers --
 
 
-inflect : WordIntent -> BasicWord -> BasicWord
+inflect : Intent -> BaseWord -> BaseWord
 inflect intent word =
     let
         updateRoot =
@@ -288,7 +312,7 @@ inflect intent word =
     in
     { word
         | root = updateRoot word.category word.root
-        , kana = updateRoot word.category word.kana
+        , furigana = updateRoot word.category word.furigana
         , category = intentToCategory intent
     }
 

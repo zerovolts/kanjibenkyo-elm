@@ -5,10 +5,10 @@ import Element as E exposing (Element, column, el, row, text, wrappedRow)
 import Element.Font as Font
 import Msg exposing (Msg(..))
 import Page.Basic exposing (button, hr, kanaBlock)
-import Word exposing (BasicWord, InflectedWord, WordIntent(..))
+import Word exposing (BaseWord, InflectedWord, Intent(..))
 
 
-view : Dict String BasicWord -> Element Msg
+view : Dict String BaseWord -> Element Msg
 view words =
     let
         wordList =

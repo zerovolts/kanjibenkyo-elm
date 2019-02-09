@@ -5,13 +5,18 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE InstanceSigs #-}
 
-module Tables.KanjiTable (KanjiTable) where
+module Tables.KanjiTable
+  ( KanjiTable
+  , Kanji
+  , _kanjiCharacter
+  )
+where
 
-import Data.Aeson
-import Data.Text (Text)
-import Data.Vector
-import Database.Beam
-import GHC.Generics (Generic)
+import           Data.Aeson
+import           Data.Text                      ( Text )
+import           Data.Vector
+import           Database.Beam
+import           GHC.Generics                   ( Generic )
 
 data KanjiTable f = Kanji
     { _kanjiId :: Columnar f Int
@@ -26,7 +31,10 @@ data KanjiTable f = Kanji
     } deriving stock (Generic)
       deriving anyclass (Beamable)
 
-instance ToJSON (KanjiTable Identity) -- fill this in
+type Kanji = KanjiTable Identity
+
+instance ToJSON (Kanji) -- fill this in
+instance FromJSON (Kanji)
 
 instance Table KanjiTable where
     data PrimaryKey KanjiTable f = KanjiId (Columnar f Int)

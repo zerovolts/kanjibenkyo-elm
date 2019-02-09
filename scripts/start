@@ -1,6 +1,6 @@
 #!/bin/sh
 
 tmux new-session -d -s "kanjibenkyo" "cd client && elm-app start"
-tmux split-window -h "cd server && cargo run"
+tmux split-window -h "cd server && stack build && stack exec server"
 tmux select-pane -t 0 
 tmux -2 attach-session -d

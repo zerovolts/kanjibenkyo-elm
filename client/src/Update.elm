@@ -10,7 +10,7 @@ import Msg exposing (Msg(..))
 import Ports
 import Route exposing (Route(..))
 import Url
-import Word exposing (BasicWord, InflectedWord, pushIntent, removeIntent)
+import Word exposing (BaseWord, InflectedWord, pushIntent, removeIntent)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -88,8 +88,8 @@ update msg model =
             )
 
         ChangeCurrentWord word ->
-            ( { model | currentWord = Word.fromBasicWord word }
-            , speakWord (Word.fromBasicWord word)
+            ( { model | currentWord = Word.fromBaseWord word }
+            , speakWord (Word.fromBaseWord word)
             )
 
         RemoveInflection ->

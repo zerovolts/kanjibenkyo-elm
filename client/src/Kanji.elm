@@ -60,4 +60,4 @@ isKanji char =
 
 
 
--- getWords : Dict String BasicWord-> Kanji -> List BasicWord
+-- getWords : Dict String BaseWord-> Kanji -> List BaseWord

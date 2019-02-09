@@ -22,8 +22,8 @@ view kanaDict word =
                 , Border.rounded 5
                 ]
                 (List.map
-                    (\basicWord -> radioButton (word.word == basicWord) { label = text basicWord.root, onPress = Just (ChangeCurrentWord basicWord) })
-                    [ Word.default, Word.defaultGodan ]
+                    (\baseWord -> radioButton (word.word == baseWord) { label = text baseWord.root, onPress = Just (ChangeCurrentWord baseWord) })
+                    [ Word.dictionaryToBaseWord Word.default, Word.dictionaryToBaseWord Word.defaultGodan ]
                 )
 
         removeButton =

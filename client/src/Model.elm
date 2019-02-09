@@ -11,14 +11,14 @@ import Page.Kanji.Show as KanjiShow
 import Route exposing (Route(..))
 import Url exposing (Url)
 import User exposing (User)
-import Word exposing (BasicWord, InflectedWord)
+import Word exposing (DictionaryWord, InflectedWord)
 
 
 type alias Model =
     { user : User
     , kanaDict : Dict Char Kana
     , kanjiDict : Dict Char Kanji
-    , wordsDict : Dict String BasicWord
+    , wordsDict : Dict String DictionaryWord
     , url : Url
     , key : Key
     , route : Route
@@ -60,7 +60,7 @@ init flags url key =
                 , { x = 0, y = 48, deltaX = 0.2 }
                 , { x = 0, y = 160, deltaX = -0.15 }
                 ]
-            , currentWord = Word.fromBasicWord Word.defaultGodan
+            , currentWord = Word.defaultGodan |> Word.dictionaryToBaseWord |> Word.fromBaseWord
             }
     in
     ( model
